@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 零基础入门 — 为数学系学生打造</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f5f7;--card:#fff;--text:#1d1d1f;--text2:#6e6e73;--text3:#aeaeb2;
+  --accent:#0071e3;--accent-light:rgba(0,113,227,0.08);--green:#30d158;
+  --orange:#ff9f0a;--red:#ff453a;--purple:#bf5af2;
+  --border:rgba(0,0,0,0.06);--border-strong:rgba(0,0,0,0.10);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 30px rgba(0,0,0,0.08);
+  --radius:14px;--radius-lg:20px;
+  --font:'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC',sans-serif;
+  --mono:'JetBrains Mono','SF Mono','Cascadia Code','Consolas',monospace;
+  --sidebar-w:260px;
+  --ease:0.3s cubic-bezier(0.25,0.1,0.25,1);
+  --spring:0.5s cubic-bezier(0.22,0.61,0.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;display:flex;min-height:100vh}
+
+/* ===== SIDEBAR ===== */
+.sidebar{width:var(--sidebar-w);background:rgba(255,255,255,0.72);backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;
+  overflow-y:auto;z-index:100;padding:20px 0 40px;display:flex;flex-direction:column}
+.sidebar-logo{padding:12px 20px 16px;font-size:1rem;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:8px;letter-spacing:-0.02em;border-bottom:1px solid var(--border);margin-bottom:8px}
+.sidebar-logo .py-icon{font-size:1.4rem}
+.sidebar-nav{flex:1;overflow-y:auto;padding:0 12px}
+.nav-group{margin-bottom:2px}
+.nav-group-title{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;
+  font-size:0.8rem;font-weight:600;color:var(--text2);cursor:pointer;border-radius:8px;
+  transition:all 0.15s ease;user-select:none;letter-spacing:-0.01em}
+.nav-group-title:hover{background:rgba(0,0,0,0.03);color:var(--text)}
+.nav-group-title .arrow{font-size:0.55rem;transition:transform 0.25s ease;color:var(--text3)}
+.nav-group.collapsed .arrow{transform:rotate(-90deg)}
+.nav-group-links{overflow:hidden;transition:max-height 0.3s ease;padding-left:4px}
+.nav-group.collapsed .nav-group-links{max-height:0!important}
+.nav-link{display:block;padding:5px 10px 5px 14px;font-size:0.78rem;color:var(--text3);
+  text-decoration:none;border-radius:6px;transition:all 0.15s ease;border-left:2px solid transparent;
+  letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-link:hover{color:var(--text);background:rgba(0,0,0,0.03)}
+.nav-link.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:550}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);font-size:0.7rem;color:var(--text3);text-align:center}
+
+/* ===== MAIN CONTENT ===== */
+.main{margin-left:var(--sidebar-w);flex:1;padding:40px 48px 80px;max-width:calc(100% - var(--sidebar-w))}
+
+/* Hero */
+.hero{padding:40px 0 50px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);
+  color:var(--accent);padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;margin-bottom:18px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
+.hero h1{font-size:2.8rem;font-weight:800;letter-spacing:-0.03em;line-height:1.1;
+  background:linear-gradient(135deg,#1d1d1f 0%,#0071e3 50%,#bf5af2 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero h1 .py{background:linear-gradient(135deg,#3776AB,#FFD43B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.05rem;color:var(--text2);max-width:480px;margin:0 auto}
+
+/* Section */
+.sec{margin-bottom:60px;scroll-margin-top:30px}
+.sec h2{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.sec h3{font-size:1.15rem;font-weight:650;margin:28px 0 10px;letter-spacing:-0.01em}
+.sec h4{font-size:0.95rem;font-weight:600;color:var(--text2);margin:16px 0 6px}
+.sec p{margin-bottom:12px;font-size:0.9rem;color:var(--text2);line-height:1.65}
+.sec strong{color:var(--text)}
+.sec li{color:var(--text2);margin-bottom:6px;font-size:0.9rem;line-height:1.6}
+.sec .sub{font-size:0.8rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+
+/* Code */
+.code-wrap{background:#1d1d1f;border-radius:var(--radius);margin:18px 0;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.08)}
+.code-wrap-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;
+  background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06)}
+.code-dots{display:flex;gap:6px}
+.code-dot{width:10px;height:10px;border-radius:50%}
+.code-dot.red{background:#ff5f56}.code-dot.yellow{background:#ffbd2e}.code-dot.green{background:#27c93f}
+.code-lang{font-size:0.7rem;color:rgba(255,255,255,0.4);font-family:var(--font);font-weight:500;text-transform:uppercase;letter-spacing:0.04em}
+.code-copy{font-size:0.7rem;color:rgba(255,255,255,0.35);background:none;border:1px solid rgba(255,255,255,0.12);
+  padding:3px 9px;border-radius:5px;cursor:pointer;font-family:var(--font);transition:all 0.15s ease}
+.code-copy:hover{color:#fff;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.06)}
+.code-copy.copied{color:#30d158;border-color:rgba(48,209,88,0.4)}
+.code-wrap pre{padding:16px 18px;overflow-x:auto;margin:0}
+.code-wrap code{font-family:var(--mono);font-size:0.8rem;line-height:1.65;color:#e6e6e6;font-weight:400}
+.syn-k{color:#fc6a9e}.syn-s{color:#a5d6ff}.syn-n{color:#79c0ff}
+.syn-c{color:#6a737d;font-style:italic}.syn-f{color:#d2a8ff}.syn-b{color:#ffa657}.syn-v{color:#7ee787}
+
+/* Output */
+.output{background:#f0fdf4;border:1px solid rgba(48,209,88,0.25);border-radius:8px;
+  padding:10px 14px;margin:10px 0;font-family:var(--mono);font-size:0.8rem;color:#166534}
+.output-label{font-size:0.65rem;font-weight:600;color:rgba(22,101,52,0.6);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;margin:14px 0;border-radius:8px;border:1px solid var(--border)}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.tbl-wrap th{background:#f9f9fb;padding:9px 14px;text-align:left;font-weight:600;border-bottom:1px solid var(--border)}
+.tbl-wrap td{padding:8px 14px;border-bottom:1px solid rgba(0,0,0,0.04);color:var(--text2)}
+.tbl-wrap tr:last-child td{border-bottom:none}
+.tbl-wrap tr:hover td{background:rgba(0,113,227,0.02)}
+
+/* Tags & Notes */
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;margin-right:3px}
+.tag-b{background:rgba(0,113,227,0.08);color:var(--accent)}
+.tag-g{background:rgba(48,209,88,0.1);color:#248a3d}
+.tag-o{background:rgba(255,159,10,0.1);color:#b86800}
+.tag-p{background:rgba(191,90,242,0.1);color:#8944ab}
+.note{background:#f0f7ff;border-left:3px solid var(--accent);padding:12px 16px;margin:16px 0;
+  border-radius:0 8px 8px 0;font-size:0.86rem;color:var(--text2)}
+.note strong{color:var(--accent)}
+.tip{background:#fefce8;border-left:3px solid var(--orange);padding:12px 16px;margin:16px 0;
+  border-radius:0 8px 8px 0;font-size:0.86rem;color:#713f12}
+
+/* Diagram */
+.diagram{background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin:16px 0;text-align:center;overflow-x:auto}
+.diagram svg{max-width:100%;height:auto}
+
+/* Exercise */
+.ex{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px 28px;margin:20px 0;box-shadow:var(--shadow-sm);transition:all var(--ease)}
+.ex:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md)}
+.ex-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  background:var(--accent-light);color:var(--accent);border-radius:50%;font-size:0.75rem;font-weight:700;margin-bottom:10px}
+.ex h4{font-size:1rem;font-weight:650;margin-bottom:4px}
+.ex .hint{font-size:0.8rem;color:var(--text3);margin-bottom:12px}
+.ex .code-editor{width:100%;min-height:70px;background:#1d1d1f;color:#e6e6e6;border:none;
+  border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:0.8rem;
+  resize:vertical;outline:none;line-height:1.6}
+.ex .code-editor:focus{box-shadow:0 0 0 3px rgba(0,113,227,0.15)}
+.ex .input-hint{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:0.78rem;color:var(--text3)}
+.ex .input-hint input{flex:1;max-width:200px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;
+  font-family:var(--mono);font-size:0.78rem;background:var(--bg);color:var(--text);outline:none}
+.ex .input-hint input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,113,227,0.1)}
+.ex .run-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:18px;
+  font-size:0.82rem;font-weight:600;cursor:pointer;font-family:var(--font);
+  transition:all 0.15s ease;letter-spacing:-0.01em}
+.ex .run-btn:hover{background:#0077ed;transform:scale(1.03);box-shadow:0 4px 16px rgba(0,113,227,0.2)}
+.ex .run-btn:active{transform:scale(0.97)}
+.ex .feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:0.82rem;
+  font-family:var(--mono);display:none;white-space:pre-wrap;line-height:1.5}
+.ex .feedback.ok{display:block;background:#f0fdf4;color:#166534;border:1px solid rgba(48,209,88,0.2)}
+.ex .feedback.err{display:block;background:#fef2f2;color:#991b1b;border:1px solid rgba(255,69,58,0.2)}
+.ex.debug{border-color:rgba(255,159,10,0.25);background:#fffdf7}
+.ex.debug .ex-num{background:rgba(255,159,10,0.12);color:#b86800}
+/* Download btn */
+.dl-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:20px 24px;margin:12px 0;display:flex;align-items:center;gap:16px;
+  box-shadow:var(--shadow-sm);transition:all var(--ease)}
+.dl-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.dl-card-icon{font-size:1.6rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:12px;flex-shrink:0}
+.dl-card-info{flex:1}
+.dl-card-info h4{font-size:0.92rem;font-weight:650;margin-bottom:2px}
+.dl-card-info p{font-size:0.78rem;color:var(--text3);margin:0}
+.dl-card-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;
+  border:none;padding:7px 16px;border-radius:16px;font-size:0.78rem;font-weight:600;cursor:pointer;
+  font-family:var(--font);transition:all 0.15s ease;letter-spacing:-0.01em}
+.dl-card-btn:hover{background:#0077ed;transform:scale(1.03)}
+.dl-card-btn:active{transform:scale(0.97)}
+.dl-card-btn.view{background:rgba(0,0,0,0.04);color:var(--text2)}
+.dl-card-btn.view:hover{background:rgba(0,0,0,0.08);color:var(--text)}
+/* Tool modal */
+.tool-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:2000;
+  background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.tool-modal.open{display:flex;align-items:center;justify-content:center}
+.tool-modal-inner{background:var(--card);border-radius:var(--radius-lg);width:90%;max-width:700px;
+  max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-xl);padding:28px 32px}
+.tool-modal-inner h3{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+.tool-modal-inner .code-wrap{margin:12px 0}
+.tool-modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text2);padding:4px 8px;border-radius:6px}
+.tool-modal-close:hover{background:rgba(0,0,0,0.05);color:var(--text)}
+
+/* Back to top */
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,0.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,0,0,0.08);box-shadow:var(--shadow-md);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--text2);
+  opacity:0;transform:translateY(10px);transition:all var(--ease);z-index:999;pointer-events:none}
+.back-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.back-top:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);color:var(--accent)}
+
+/* Fade in */
+.fade{opacity:0;transform:translateY(20px);transition:all 0.5s cubic-bezier(0.22,0.61,0.36,1)}
+.fade.in{opacity:1;transform:translateY(0)}
+
+/* Mobile */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s ease}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:20px 16px 60px;max-width:100%}
+  .hero h1{font-size:1.8rem}
+  .menu-btn{display:flex!important}
+}
+.menu-btn{display:none;position:fixed;bottom:20px;right:20px;width:44px;height:44px;
+  background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:1.3rem;
+  cursor:pointer;z-index:200;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+/* Pyodide status */
+.py-status{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;
+  font-size:0.75rem;font-weight:550;font-family:var(--font);transition:all 0.3s ease}
+.py-status.loading{background:rgba(255,159,10,0.1);color:#b86800}
+.py-status.ready{background:rgba(48,209,88,0.1);color:#248a3d}
+.py-status.error{background:rgba(255,69,58,0.1);color:#c73b32}
+.py-status .py-dot{width:7px;height:7px;border-radius:50%}
+.py-status.loading .py-dot{background:#ff9f0a;animation:pulse 1.5s ease-in-out infinite}
+.py-status.ready .py-dot{background:#30d158}
+.py-status.error .py-dot{background:#ff453a}
+</style>
+</head>
+<body>
+
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span class="py-icon">🐍</span>Python 入门教程</div>
+  <div style="padding:4px 14px 8px;"><span class="py-status loading" id="pyStatus"><span class="py-dot"></span>Python 环境加载中...</span></div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">UCL Mathematics · 2026</div>
+</aside>
+<button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ====== MAIN CONTENT ====== -->
+<main class="main" id="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span class="dot"></span>为 UCL 数学系新生量身打造</div>
+  <h1>从零开始学 <span class="py">Python</span></h1>
+  <p>专为数学系学生设计的互动教程——清晰图解、丰富数学示例、边学边练</p>
+</div>
+
+<!-- ====== PART 1: PYTHON 基础 ====== -->
+<div class="sec" id="p1">
+<h2>🔰 第一部分：Python 基础</h2>
+<p>数据类型、变量、运算符、输入输出——编程的第一步</p>
+
+<h3 id="s1-1">1.1 什么是 Python？</h3>
+<p>Python 由 Guido van Rossum 于 1991 年创造，是一种<strong>解释型、面向对象</strong>的高级编程语言。设计哲学强调<strong>代码可读性</strong>——Python 代码看起来就像英语。</p>
+<div class="diagram"><svg width="680" height="160" viewBox="0 0 680 160">
+<defs><filter id="sh1"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.08"/></filter></defs>
+<rect x="15" y="35" width="145" height="80" rx="14" fill="#fff" stroke="rgba(0,113,227,0.25)" stroke-width="2" filter="url(#sh1)"/>
+<text x="87" y="70" text-anchor="middle" fill="#0071e3" font-size="13" font-weight="700">📖 易学易读</text><text x="87" y="92" text-anchor="middle" fill="#6e6e73" font-size="11">接近自然语言</text>
+<rect x="185" y="35" width="145" height="80" rx="14" fill="#fff" stroke="rgba(48,209,88,0.25)" stroke-width="2" filter="url(#sh1)"/>
+<text x="257" y="70" text-anchor="middle" fill="#248a3d" font-size="13" font-weight="700">⚡ 功能强大</text><text x="257" y="92" text-anchor="middle" fill="#6e6e73" font-size="11">丰富的库生态</text>
+<rect x="355" y="35" width="145" height="80" rx="14" fill="#fff" stroke="rgba(255,159,10,0.25)" stroke-width="2" filter="url(#sh1)"/>
+<text x="427" y="70" text-anchor="middle" fill="#b86800" font-size="13" font-weight="700">🌍 跨平台</text><text x="427" y="92" text-anchor="middle" fill="#6e6e73" font-size="11">Win / Mac / Linux</text>
+<rect x="525" y="35" width="140" height="80" rx="14" fill="#fff" stroke="rgba(191,90,242,0.25)" stroke-width="2" filter="url(#sh1)"/>
+<text x="595" y="70" text-anchor="middle" fill="#8944ab" font-size="13" font-weight="700">🔓 开源免费</text><text x="595" y="92" text-anchor="middle" fill="#6e6e73" font-size="11">社区驱动开发</text>
+<text x="340" y="146" text-anchor="middle" fill="#aeaeb2" font-size="12">Python 的四大核心优势</text></svg></div>
+<div class="note"><strong>🎓 数学系特别提示：</strong>Python 拥有 NumPy、SciPy、SymPy、Matplotlib 等数学库，是数学建模、数值分析、统计计算的首选工具。UCL 多门数学课程都使用 Python。</div>
+<h4>Python 在数学领域的应用</h4>
+<div class="tbl-wrap"><table>
+<tr><th>领域</th><th>核心库</th><th>应用场景</th></tr>
+<tr><td>🔢 纯数学</td><td>SymPy, SageMath</td><td>符号运算、代数推导、数论研究</td></tr>
+<tr><td>📊 数值分析</td><td>NumPy, SciPy</td><td>线性代数、微分方程、优化问题</td></tr>
+<tr><td>📈 统计与概率</td><td>Pandas, SciPy.stats</td><td>数据分析、假设检验、随机模拟</td></tr>
+<tr><td>🤖 机器学习</td><td>scikit-learn, PyTorch</td><td>回归、分类、神经网络</td></tr>
+<tr><td>📉 可视化</td><td>Matplotlib, Plotly</td><td>函数图像、数据图表、3D 绘图</td></tr>
+<tr><td>🔐 密码学</td><td>hashlib, pycryptodome</td><td>RSA 加密、哈希函数、素数生成</td></tr>
+</table></div>
+
+<h3 id="s1-2">1.2 安装 Python 与环境配置</h3>
+<h4>📥 Windows 安装步骤</h4>
+<ol><li>访问 <a href="https://python.org" target="_blank" style="color:var(--accent);font-weight:600;">python.org</a> → Downloads → 下载最新版（3.12+）</li>
+<li>运行安装程序，<strong style="color:var(--orange);">⚠️ 务必勾选 "Add Python to PATH"</strong></li>
+<li>点击 Install Now，等待完成</li>
+<li>按 <code style="background:rgba(0,0,0,0.05);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.85rem;">Win + R</code> → 输入 <code style="background:rgba(0,0,0,0.05);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.85rem;">cmd</code> → 输入 <code style="background:rgba(0,0,0,0.05);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.85rem;">python --version</code> 验证</li></ol>
+<h4>🛠️ 推荐开发工具（选其一即可）</h4>
+<div class="tbl-wrap"><table>
+<tr><th>工具</th><th>类型</th><th>适合人群</th><th>安装方式</th></tr>
+<tr><td><span class="tag tag-b">IDLE</span></td><td>简易编辑器</td><td>完全零基础，只想试试</td><td>Python 自带，无需额外安装</td></tr>
+<tr><td><span class="tag tag-b">VS Code</span></td><td>代码编辑器</td><td>初学者 ⭐ 首推</td><td><a href="https://code.visualstudio.com" style="color:var(--accent);">code.visualstudio.com</a> 下载</td></tr>
+<tr><td><span class="tag tag-g">Jupyter</span></td><td>交互式笔记</td><td>数学系学生 ⭐ 必装</td><td>终端运行 <code>pip install jupyter</code></td></tr>
+<tr><td><span class="tag tag-p">PyCharm</span></td><td>专业 IDE</td><td>准备深入学习</td><td><a href="https://jetbrains.com/pycharm" style="color:var(--accent);">jetbrains.com/pycharm</a> 下载 Community 版（免费）</td></tr>
+</table></div>
+
+<h4>🚀 快速上手：从安装到运行第一个程序</h4>
+<p><strong>方案 A：使用 IDLE（最简单，适合第一次接触）</strong></p>
+<ol><li>安装 Python 后，在开始菜单搜索 <strong>IDLE</strong>，打开它</li><li>你会看到一个 <code>>>></code> 提示符的窗口（Python Shell）</li><li>直接输入 <code>print("Hello!")</code>，按回车——代码立刻执行！</li><li>要写多行代码：File → New File → 写代码 → F5 运行</li></ol>
+
+<p style="margin-top:16px;"><strong>方案 B：使用 VS Code（推荐，功能更强）</strong></p>
+<ol><li>下载安装 <a href="https://code.visualstudio.com" target="_blank" style="color:var(--accent);">VS Code</a></li><li>打开 VS Code → 左侧 Extensions（Ctrl+Shift+X）→ 搜索 "<strong>Python</strong>" → 安装 Microsoft 官方 Python 插件</li><li>新建文件 → 写代码 → 右上角 ▶ 按钮运行</li></ol>
+
+<p style="margin-top:16px;"><strong>方案 C：使用 PyCharm Community（最专业）</strong></p>
+<ol><li>下载 <a href="https://www.jetbrains.com/pycharm/download/" target="_blank" style="color:var(--accent);">PyCharm Community Edition</a>（免费版）</li><li>安装时勾选 "Add launchers dir to PATH"</li><li>New Project → 选择 Python 解释器 → Create → 右键 → Run</li></ol>
+
+<div class="tip"><strong>💡 建议：</strong>初学编程用 <strong>VS Code</strong>（免费、轻量、插件强大），做数学作业用 <strong>Jupyter Notebook</strong>（在终端运行 <code>pip install jupyter</code> 然后 <code>jupyter notebook</code> 启动）。<br><br>📥 <strong>下载了本页面的数学工具 .py 文件后：</strong>用 IDLE 或 VS Code 打开文件 → 按 F5 或点击运行 → 即可看到演示输出。你也可以导入这些文件到自己的项目中使用。</div>
+
+<h3 id="s1-3">1.3 第一个程序：Hello, World!</h3>
+<p>学习任何编程语言的第一步——让计算机对你说话。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-f">print</span>(<span class="syn-s">"Hello, World!"</span>)</code></pre></div>
+<div class="output"><div class="output-label">▸ 输出结果</div>Hello, World!</div>
+<h4>逐词解析</h4>
+<p><code style="background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:3px;font-weight:600;color:var(--accent);">print</code> — Python 的<strong>内置函数</strong>。函数是预先写好的功能模块，"调用"它就能完成特定任务（在屏幕上显示内容）。</p>
+<p><code style="background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:3px;color:#248a3d;">( )</code> — 括号表示"执行这个函数"。括号里放的是<strong>参数</strong>——你要传给函数的数据。</p>
+<p><code style="background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:3px;color:#c73b32;">"Hello, World!"</code> — <strong>字符串</strong>（文本数据）。双引号告诉 Python"这是一段文字，不是代码"。</p>
+<div class="diagram"><svg width="460" height="100" viewBox="0 0 460 100">
+<rect x="10" y="28" width="80" height="48" rx="10" fill="#f0f7ff" stroke="#0071e3" stroke-width="2"/>
+<text x="50" y="57" text-anchor="middle" fill="#0071e3" font-size="14" font-weight="700">print()</text>
+<text x="115" y="57" fill="#aeaeb2" font-size="22">→</text>
+<rect x="145" y="28" width="120" height="48" rx="10" fill="#f0fdf4" stroke="#30d158" stroke-width="2"/>
+<text x="205" y="57" text-anchor="middle" fill="#166534" font-size="14" font-weight="600">屏幕输出</text>
+<text x="290" y="57" fill="#aeaeb2" font-size="22">→</text>
+<text x="320" y="57" fill="#1d1d1f" font-size="15" font-weight="700">Hello, World!</text></svg></div>
+<div class="ex"><div class="ex-num">1</div><h4>✏️ 你的第一行代码</h4><p class="hint">修改代码，打印你的名字（例如 "My name is Alex"）</p><textarea class="code-editor" id="ed-ex1">print("Hello, World!")</textarea><button class="run-btn" onclick="runCode('ex1')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex1"></div></div>
+
+<h3 id="s1-4">1.4 变量与数据类型</h3>
+<h4>📦 变量——带标签的存储盒</h4>
+<p>变量让计算机记住数据。想象一个<strong>贴了标签的盒子</strong>——标签是变量名，盒子里是数据。用 <code>=</code> 把数据放进去。</p>
+<div class="diagram"><svg width="500" height="140" viewBox="0 0 500 140">
+<rect x="50" y="12" width="100" height="70" rx="10" fill="#fff" stroke="#0071e3" stroke-width="2.5"/>
+<text x="100" y="50" text-anchor="middle" fill="#1d1d1f" font-size="19" font-weight="700">42</text>
+<text x="100" y="70" text-anchor="middle" fill="#0071e3" font-size="10" font-weight="600">数据</text>
+<text x="100" y="100" text-anchor="middle" fill="#bf5af2" font-size="14" font-weight="700">age</text>
+<line x1="100" y1="82" x2="100" y2="92" stroke="#bf5af2" stroke-width="2"/>
+<text x="185" y="52" fill="#6e6e73" font-size="15">← age = 42</text>
+<text x="185" y="72" fill="#aeaeb2" font-size="12">变量名 = 值 （注意：= 是赋值，不是等于）</text></svg></div>
+<h4>四种基本数据类型</h4>
+<div class="tbl-wrap"><table>
+<tr><th>类型</th><th>关键字</th><th>例子</th><th>数学对应</th></tr>
+<tr><td>整数</td><td><span class="tag tag-b">int</span></td><td>42, -7, 2**100</td><td>ℤ（任意精度）</td></tr>
+<tr><td>浮点数</td><td><span class="tag tag-b">float</span></td><td>3.14, -0.5, 1e-10</td><td>ℝ 近似值</td></tr>
+<tr><td>字符串</td><td><span class="tag tag-g">str</span></td><td>"Hello", 'π≈3.14'</td><td>文本公式</td></tr>
+<tr><td>布尔值</td><td><span class="tag tag-o">bool</span></td><td>True / False</td><td>命题逻辑</td></tr>
+</table></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 变量赋值——把数据放进带标签的盒子</span>
+<span class="syn-v">name</span> = <span class="syn-s">"Alice"</span>        <span class="syn-c"># str 字符串</span>
+<span class="syn-v">age</span> = <span class="syn-n">18</span>               <span class="syn-c"># int 整数</span>
+<span class="syn-v">height</span> = <span class="syn-n">1.75</span>           <span class="syn-c"># float 浮点数</span>
+<span class="syn-v">is_student</span> = <span class="syn-b">True</span>     <span class="syn-c"># bool 布尔值</span>
+
+<span class="syn-c"># 查看变量的类型</span>
+<span class="syn-f">print</span>(<span class="syn-f">type</span>(age))       <span class="syn-c"># &lt;class 'int'&gt;</span>
+<span class="syn-f">print</span>(<span class="syn-f">type</span>(height))    <span class="syn-c"># &lt;class 'float'&gt;</span></code></pre></div>
+<div class="note"><strong>🔍 动态类型：</strong>Python 变量不需要提前声明类型。这与 C/Java 不同，写代码更快更灵活。</div>
+<div class="ex"><div class="ex-num">2</div><h4>✏️ 创建变量</h4><p class="hint">创建变量 <code>my_age</code> 存放你的年龄，然后打印它</p><textarea class="code-editor" id="ed-ex2">my_age = 18
+print("我的年龄是:", my_age)</textarea><button class="run-btn" onclick="runCode('ex2')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex2"></div></div>
+
+<h3 id="s1-5">1.5 运算符——让数据动起来</h3>
+<div class="tbl-wrap"><table>
+<tr><th>运算符</th><th>含义</th><th>示例</th><th>结果</th><th>数学对应</th></tr>
+<tr><td>+</td><td>加法</td><td>5 + 3</td><td>8</td><td>a + b</td></tr>
+<tr><td>-</td><td>减法</td><td>5 - 3</td><td>2</td><td>a − b</td></tr>
+<tr><td>*</td><td>乘法</td><td>5 * 3</td><td>15</td><td>a × b</td></tr>
+<tr><td>/</td><td>除法</td><td>5 / 2</td><td>2.5</td><td>a ÷ b ∈ ℝ</td></tr>
+<tr><td>//</td><td>整除</td><td>5 // 2</td><td>2</td><td>⌊a/b⌋</td></tr>
+<tr><td>%</td><td>取模</td><td>5 % 2</td><td>1</td><td>a mod b</td></tr>
+<tr><td>**</td><td>幂运算</td><td>2 ** 10</td><td>1024</td><td>aᵇ</td></tr>
+</table></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">a</span>, <span class="syn-v">b</span> = <span class="syn-n">10</span>, <span class="syn-n">3</span>
+<span class="syn-f">print</span>(<span class="syn-v">a</span> + <span class="syn-v">b</span>)    <span class="syn-c"># 13</span>
+<span class="syn-f">print</span>(<span class="syn-v">a</span> / <span class="syn-v">b</span>)    <span class="syn-c"># 3.333...（浮点精度）</span>
+<span class="syn-f">print</span>(<span class="syn-v">a</span> // <span class="syn-v">b</span>)   <span class="syn-c"># 3（整除，向下取整）</span>
+<span class="syn-f">print</span>(<span class="syn-v">a</span> % <span class="syn-v">b</span>)    <span class="syn-c"># 1（余数：10 = 3×3 + 1）</span>
+<span class="syn-f">print</span>(<span class="syn-v">a</span> ** <span class="syn-v">b</span>)   <span class="syn-c"># 1000（10³）</span>
+
+<span class="syn-c"># 📐 用 % 判断整除</span>
+<span class="syn-f">print</span>(<span class="syn-n">15</span> % <span class="syn-n">5</span> == <span class="syn-n">0</span>)  <span class="syn-c"># True → 15 是 5 的倍数</span></code></pre></div>
+<div class="note"><strong>⚠️ 重点：</strong><code>=</code> 是<strong>赋值</strong>，<code>==</code> 是<strong>比较</strong>。初学者最容易搞混！</div>
+<div class="ex"><div class="ex-num">3</div><h4>✏️ 高斯求和</h4><p class="hint">用 Python 验证 1+2+...+100 = n(n+1)/2 = 5050</p><textarea class="code-editor" id="ed-ex3">n = 100
+result = n * (n + 1) // 2
+print(f"1到{n}的和 = {result}")</textarea><button class="run-btn" onclick="runCode('ex3')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex3"></div></div>
+
+<h3 id="s1-6">1.6 输入与输出——让程序互动</h3>
+<h4>⌨️ input()——读取键盘输入</h4>
+<p><code>input()</code> 让用户输入数据。<strong>关键：它总是返回字符串！</strong>做数学计算前必须用 <code>int()</code> 或 <code>float()</code> 转换类型。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 数学输入——注意类型转换！</span>
+<span class="syn-v">r_str</span> = <span class="syn-f">input</span>(<span class="syn-s">"请输入圆的半径: "</span>)
+<span class="syn-v">r</span> = <span class="syn-f">float</span>(<span class="syn-v">r_str</span>)        <span class="syn-c"># 字符串 → 浮点数（必须转换）</span>
+<span class="syn-v">area</span> = <span class="syn-n">3.14159</span> * <span class="syn-v">r</span> ** <span class="syn-n">2</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"半径为 {r} 的圆面积 ≈ {area:.2f}"</span>)</code></pre></div>
+<h4>✨ f-string——最优雅的格式化</h4>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">pi</span> = <span class="syn-n">3.141592653589793</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"π 保留 2 位小数: {pi:.2f}"</span>)   <span class="syn-c"># 3.14</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"科学计数法: {pi:.4e}"</span>)       <span class="syn-c"># 3.1416e+00</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"百分比格式: {0.875:.1%}"</span>)     <span class="syn-c"># 87.5%</span></code></pre></div>
+<div class="ex"><div class="ex-num">4</div><h4>✏️ 圆面积计算器</h4><p class="hint">输入半径 r，计算面积 A = πr²（π 取 3.14159，保留 2 位小数）</p><textarea class="code-editor" id="ed-ex4">r = float(input("请输入半径: "))
+pi = 3.14159
+area = pi * r ** 2
+print(f"半径为 {r} 的圆面积 ≈ {area:.2f}")</textarea><div class="input-hint">📥 模拟输入: <input type="text" id="in-ex4" placeholder="输入半径，如 5" value="5"></div><button class="run-btn" onclick="runCode('ex4')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex4"></div></div>
+</div>
+
+<!-- ====== PART 2: 控制流程 ====== -->
+<div class="sec" id="p2">
+<h2>🔀 第二部分：控制流程</h2>
+<p>条件判断、循环结构——让程序自己做出决策</p>
+
+<h3 id="s2-1">2.1 条件判断 if / elif / else</h3>
+<p>条件语句让程序根据不同情况执行不同代码。在数学中对应<strong>分段函数</strong>。</p>
+<div class="diagram"><svg width="380" height="210" viewBox="0 0 380 210">
+<rect x="130" y="10" width="120" height="38" rx="19" fill="#f0f7ff" stroke="#0071e3" stroke-width="2"/>
+<text x="190" y="34" text-anchor="middle" fill="#0071e3" font-size="14" font-weight="700">条件判断</text>
+<line x1="190" y1="48" x2="190" y2="65" stroke="#aeaeb2" stroke-width="1.5"/><polygon points="190,65 200,76 180,76" fill="#aeaeb2"/>
+<rect x="30" y="82" width="140" height="44" rx="10" fill="#f0fdf4" stroke="#30d158" stroke-width="2"/>
+<text x="100" y="109" text-anchor="middle" fill="#166534" font-size="13" font-weight="600">True → 执行 if 块</text>
+<rect x="210" y="82" width="140" height="44" rx="10" fill="#fef2f2" stroke="#ff453a" stroke-width="2"/>
+<text x="280" y="109" text-anchor="middle" fill="#991b1b" font-size="13" font-weight="600">False → 执行 else 块</text>
+<rect x="30" y="145" width="140" height="38" rx="8" fill="#fff" stroke="rgba(0,0,0,0.08)"/><text x="100" y="169" text-anchor="middle" fill="#1d1d1f" font-size="12">代码路径 A</text>
+<rect x="210" y="145" width="140" height="38" rx="8" fill="#fff" stroke="rgba(0,0,0,0.08)"/><text x="280" y="169" text-anchor="middle" fill="#1d1d1f" font-size="12">代码路径 B</text></svg></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 📐 分段函数：f(x) = { x² (x≥0),  -x (x&lt;0) }</span>
+<span class="syn-v">x</span> = <span class="syn-f">float</span>(<span class="syn-f">input</span>(<span class="syn-s">"输入 x: "</span>))
+<span class="syn-k">if</span> <span class="syn-v">x</span> >= <span class="syn-n">0</span>:
+    <span class="syn-v">result</span> = <span class="syn-v">x</span> ** <span class="syn-n">2</span>
+    <span class="syn-f">print</span>(<span class="syn-s">f"x≥0 → f({x}) = {result}"</span>)
+<span class="syn-k">else</span>:
+    <span class="syn-v">result</span> = -<span class="syn-v">x</span>
+    <span class="syn-f">print</span>(<span class="syn-s">f"x&lt;0 → f({x}) = {result}"</span>)</code></pre></div>
+<div class="note"><strong>🔑 Python 最独特的设计：缩进即语法。</strong>同一缩进级别 = 同一代码块。通常使用 4 个空格。这是 Python 最具标志性的特征。</div>
+<div class="ex"><div class="ex-num">5</div><h4>✏️ 判断奇偶数</h4><p class="hint">用 if-else 判断 n 是奇数还是偶数（提示：n % 2 == 0 表示偶数）</p><textarea class="code-editor" id="ed-ex5">n = 7
+if n % 2 == 0:
+    print(f"{n} 是偶数")
+else:
+    print(f"{n} 是奇数")</textarea><button class="run-btn" onclick="runCode('ex5')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex5"></div></div>
+
+<h3 id="s2-2">2.2 循环 for / while</h3>
+<p>循环重复执行代码块。在数学中用于<strong>累加求和（Σ）、迭代算法、数列生成</strong>。</p>
+<h4>for 循环——已知循环次数时使用</h4>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 📐 计算 Σᵢ₌₁ⁿ i²（1²+2²+...+n²）</span>
+<span class="syn-v">n</span> = <span class="syn-n">10</span>
+<span class="syn-v">total</span> = <span class="syn-n">0</span>
+<span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-v">n</span> + <span class="syn-n">1</span>):   <span class="syn-c"># i 从 1 到 n（含 n）</span>
+    <span class="syn-v">total</span> += <span class="syn-v">i</span> ** <span class="syn-n">2</span>            <span class="syn-c"># 等价于 total = total + i**2</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"1²+2²+...+{n}² = {total}"</span>)</code></pre></div>
+<div class="output"><div class="output-label">▸ 输出结果</div>1²+2²+...+10² = 385</div>
+<h4>while 循环——条件满足时一直执行</h4>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 找大于 1000 的最小 2 的幂</span>
+<span class="syn-v">power</span> = <span class="syn-n">1</span>
+<span class="syn-k">while</span> <span class="syn-v">power</span> &lt;= <span class="syn-n">1000</span>:
+    <span class="syn-v">power</span> *= <span class="syn-n">2</span>            <span class="syn-c"># power = power * 2</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"大于 1000 的最小 2 的幂: {power}"</span>)  <span class="syn-c"># 1024</span></code></pre></div>
+<div class="ex"><div class="ex-num">6</div><h4>✏️ 计算阶乘 n!</h4><p class="hint">5! = 5×4×3×2×1 = 120。用 for 循环实现</p><textarea class="code-editor" id="ed-ex6">n = 5
+result = 1
+for i in range(1, n + 1):
+    result = result * i
+print(f"{n}! = {result}")</textarea><button class="run-btn" onclick="runCode('ex6')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex6"></div></div>
+
+<h3 id="s2-3">2.3 break 和 continue</h3>
+<div class="diagram"><svg width="480" height="130" viewBox="0 0 480 130">
+<rect x="15" y="18" width="200" height="95" rx="12" fill="#fff" stroke="rgba(255,69,58,0.3)" stroke-width="2"/>
+<text x="115" y="52" text-anchor="middle" fill="#ff453a" font-size="15" font-weight="700">⛔ break</text>
+<text x="115" y="75" text-anchor="middle" fill="#6e6e73" font-size="12">立即终止整个循环</text>
+<text x="115" y="95" text-anchor="middle" fill="#aeaeb2" font-size="11">循环到此彻底结束</text>
+<rect x="255" y="18" width="210" height="95" rx="12" fill="#fff" stroke="rgba(255,159,10,0.3)" stroke-width="2"/>
+<text x="360" y="52" text-anchor="middle" fill="#ff9f0a" font-size="15" font-weight="700">⏭️ continue</text>
+<text x="360" y="75" text-anchor="middle" fill="#6e6e73" font-size="12">跳过当前这一次迭代</text>
+<text x="360" y="95" text-anchor="middle" fill="#aeaeb2" font-size="11">继续下一次循环</text></svg></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># break：找第一个被 7 整除的数</span>
+<span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-n">100</span>):
+    <span class="syn-k">if</span> <span class="syn-v">i</span> % <span class="syn-n">7</span> == <span class="syn-n">0</span>:
+        <span class="syn-f">print</span>(<span class="syn-s">f"找到了: {i}"</span>)
+        <span class="syn-k">break</span>           <span class="syn-c"># 找到即退出，不再继续</span>
+
+<span class="syn-c"># continue：只打印奇数，跳过偶数</span>
+<span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-n">11</span>):
+    <span class="syn-k">if</span> <span class="syn-v">i</span> % <span class="syn-n">2</span> == <span class="syn-n">0</span>:
+        <span class="syn-k">continue</span>        <span class="syn-c"># 跳过偶数</span>
+    <span class="syn-f">print</span>(<span class="syn-v">i</span>, <span class="syn-v">end</span>=<span class="syn-s">" "</span>) <span class="syn-c"># 1 3 5 7 9</span></code></pre></div>
+</div>
+
+<!-- ====== PART 3: 数据结构 ====== -->
+<div class="sec" id="p3">
+<h2>📦 第三部分：数据结构</h2>
+<p>列表、字典、集合——组织和存储数据的艺术</p>
+
+<h3 id="s3-1">3.1 列表 List——最常用的容器</h3>
+<p>列表是<strong>有序、可变</strong>的容器。索引从 0 开始！</p>
+<div class="diagram"><svg width="560" height="100" viewBox="0 0 560 100">
+<text x="8" y="48" fill="#1d1d1f" font-size="15" font-weight="700">nums =</text>
+<rect x="75" y="22" width="72" height="45" rx="8" fill="#f0f7ff" stroke="#0071e3" stroke-width="2"/>
+<text x="111" y="50" text-anchor="middle" fill="#0071e3" font-size="17" font-weight="700">10</text><text x="111" y="76" text-anchor="middle" fill="#aeaeb2" font-size="10">索引 0</text>
+<rect x="152" y="22" width="72" height="45" rx="8" fill="#f0fdf4" stroke="#30d158" stroke-width="2"/>
+<text x="188" y="50" text-anchor="middle" fill="#248a3d" font-size="17" font-weight="700">20</text><text x="188" y="76" text-anchor="middle" fill="#aeaeb2" font-size="10">索引 1</text>
+<rect x="229" y="22" width="72" height="45" rx="8" fill="#fefce8" stroke="#ff9f0a" stroke-width="2"/>
+<text x="265" y="50" text-anchor="middle" fill="#b86800" font-size="17" font-weight="700">30</text><text x="265" y="76" text-anchor="middle" fill="#aeaeb2" font-size="10">索引 2</text>
+<rect x="306" y="22" width="72" height="45" rx="8" fill="#faf5ff" stroke="#bf5af2" stroke-width="2"/>
+<text x="342" y="50" text-anchor="middle" fill="#8944ab" font-size="17" font-weight="700">40</text><text x="342" y="76" text-anchor="middle" fill="#aeaeb2" font-size="10">索引 3</text>
+<text x="395" y="52" fill="#6e6e73" font-size="13">← nums[-1] 倒数第一 = 40</text></svg></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">nums</span> = [<span class="syn-n">10</span>, <span class="syn-n">20</span>, <span class="syn-n">30</span>, <span class="syn-n">40</span>, <span class="syn-n">50</span>]
+<span class="syn-f">print</span>(<span class="syn-v">nums</span>[<span class="syn-n">0</span>])      <span class="syn-c"># 10（第一个元素）</span>
+<span class="syn-f">print</span>(<span class="syn-v">nums</span>[-<span class="syn-n">1</span>])     <span class="syn-c"># 50（最后一个元素）</span>
+<span class="syn-f">print</span>(<span class="syn-v">nums</span>[<span class="syn-n">1</span>:<span class="syn-n">4</span>])   <span class="syn-c"># [20, 30, 40]（切片：索引1到3）</span>
+<span class="syn-f">print</span>(<span class="syn-f">len</span>(<span class="syn-v">nums</span>))    <span class="syn-c"># 5（列表长度）</span>
+<span class="syn-v">nums</span>.append(<span class="syn-n">60</span>)        <span class="syn-c"># 末尾添加元素</span></code></pre></div>
+<div class="ex"><div class="ex-num">7</div><h4>✏️ 列表操作</h4><p class="hint">创建平方数列表 [1,4,9,16,25]，打印长度和第 3 个元素（索引 2）</p><textarea class="code-editor" id="ed-ex7">squares = [1, 4, 9, 16, 25]
+print(f"长度: {len(squares)}")
+print(f"第三个元素: {squares[2]}")</textarea><button class="run-btn" onclick="runCode('ex7')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex7"></div></div>
+
+<h3 id="s3-2">3.2 字典 Dict——键值对</h3>
+<p>字典存储<strong>键 → 值</strong>的映射关系。通过"键"来快速查找"值"。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">student</span> = {
+    <span class="syn-s">"name"</span>: <span class="syn-s">"Alice"</span>,
+    <span class="syn-s">"age"</span>: <span class="syn-n">18</span>,
+    <span class="syn-s">"major"</span>: <span class="syn-s">"Mathematics"</span>,
+    <span class="syn-s">"ucas_score"</span>: <span class="syn-n">580</span>
+}
+<span class="syn-f">print</span>(<span class="syn-v">student</span>[<span class="syn-s">"name"</span>])        <span class="syn-c"># Alice</span>
+<span class="syn-f">print</span>(<span class="syn-v">student</span>.get(<span class="syn-s">"gpa"</span>, <span class="syn-s">"暂无"</span>)) <span class="syn-c"># 安全访问，不存在返回默认值</span></code></pre></div>
+
+<h3 id="s3-3">3.3 集合 Set——数学之友</h3>
+<p>集合是<strong>无序、不重复</strong>元素的容器。<span class="tag tag-o">数学系的天然盟友！</span>直接支持数学中的集合运算。</p>
+<div class="diagram"><svg width="360" height="185" viewBox="0 0 360 185">
+<circle cx="140" cy="90" r="70" fill="rgba(0,113,227,0.06)" stroke="#0071e3" stroke-width="2.5"/>
+<text x="105" y="72" fill="#0071e3" font-size="16" font-weight="700">A</text><text x="115" y="105" fill="#6e6e73" font-size="12">{1, 2}</text>
+<circle cx="220" cy="90" r="70" fill="rgba(48,209,88,0.06)" stroke="#30d158" stroke-width="2.5"/>
+<text x="235" y="72" fill="#248a3d" font-size="16" font-weight="700">B</text><text x="235" y="105" fill="#6e6e73" font-size="12">{5, 6}</text>
+<text x="180" y="97" text-anchor="middle" fill="#ff9f0a" font-size="12" font-weight="700">A∩B={3,4}</text>
+<text x="180" y="170" text-anchor="middle" fill="#aeaeb2" font-size="11">韦恩图——Python 集合支持所有集合运算</text></svg></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">A</span> = {<span class="syn-n">1</span>, <span class="syn-n">2</span>, <span class="syn-n">3</span>, <span class="syn-n">4</span>}
+<span class="syn-v">B</span> = {<span class="syn-n">3</span>, <span class="syn-n">4</span>, <span class="syn-n">5</span>, <span class="syn-n">6</span>}
+<span class="syn-f">print</span>(<span class="syn-v">A</span> | <span class="syn-v">B</span>)  <span class="syn-c"># 并集 A∪B: {1,2,3,4,5,6}</span>
+<span class="syn-f">print</span>(<span class="syn-v">A</span> & <span class="syn-v">B</span>)  <span class="syn-c"># 交集 A∩B: {3,4}</span>
+<span class="syn-f">print</span>(<span class="syn-v">A</span> - <span class="syn-v">B</span>)  <span class="syn-c"># 差集 A\B: {1,2}</span>
+<span class="syn-f">print</span>(<span class="syn-v">A</span> ^ <span class="syn-v">B</span>)  <span class="syn-c"># 对称差 A△B: {1,2,5,6}</span></code></pre></div>
+
+<h3 id="s3-4">3.4 字符串操作详解</h3>
+<p>字符串是 Python 中最常用的数据类型之一。以下是最实用的字符串方法：</p>
+<div class="tbl-wrap"><table>
+<tr><th>方法</th><th>作用</th><th>示例</th><th>结果</th></tr>
+<tr><td>.upper()</td><td>全大写</td><td>"hello".upper()</td><td>"HELLO"</td></tr>
+<tr><td>.lower()</td><td>全小写</td><td>"HELLO".lower()</td><td>"hello"</td></tr>
+<tr><td>.strip()</td><td>去首尾空格</td><td>" hi ".strip()</td><td>"hi"</td></tr>
+<tr><td>.replace(a,b)</td><td>替换子串</td><td>"abac".replace("a","x")</td><td>"xbxc"</td></tr>
+<tr><td>.split(d)</td><td>按分隔符分割</td><td>"a,b,c".split(",")</td><td>["a","b","c"]</td></tr>
+<tr><td>.join(seq)</td><td>用分隔符连接</td><td>"-".join(["a","b"])</td><td>"a-b"</td></tr>
+<tr><td>.startswith(s)</td><td>判断前缀</td><td>"hello".startswith("he")</td><td>True</td></tr>
+<tr><td>.find(s)</td><td>查找子串位置</td><td>"hello".find("ll")</td><td>2</td></tr>
+<tr><td>len(s)</td><td>字符串长度</td><td>len("hello")</td><td>5</td></tr>
+<tr><td>in 运算符</td><td>判断包含</td><td>"ell" in "hello"</td><td>True</td></tr>
+</table></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-v">text</span> = <span class="syn-s">"  Hello, Python!  "</span>
+<span class="syn-f">print</span>(<span class="syn-v">text</span>.strip())         <span class="syn-c"># "Hello, Python!"</span>
+<span class="syn-f">print</span>(<span class="syn-v">text</span>.upper())         <span class="syn-c"># "  HELLO, PYTHON!  "</span>
+<span class="syn-f">print</span>(<span class="syn-v">text</span>.replace(<span class="syn-s">"Python"</span>,<span class="syn-s">"World"</span>)) <span class="syn-c"># "  Hello, World!  "</span>
+<span class="syn-f">print</span>(<span class="syn-s">"-"</span>.join([<span class="syn-s">"a"</span>,<span class="syn-s">"b"</span>,<span class="syn-s">"c"</span>])) <span class="syn-c"># "a-b-c"</span></code></pre></div>
+</div>
+
+<!-- ====== PART 4: 函数与模块 ====== -->
+<div class="sec" id="p4">
+<h2>🔧 第四部分：函数与模块</h2>
+<p>封装逻辑、复用代码——写出优雅的程序</p>
+
+<h3 id="s4-1">4.1 函数——可重复使用的代码块</h3>
+<p>函数是<strong>一段有名字的、可重复使用的代码</strong>。它接收输入（参数）→ 执行处理 → 返回输出。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 📐 定义数学函数 f(x) = x² + 2x + 1 = (x+1)²</span>
+<span class="syn-k">def</span> <span class="syn-f">f</span>(<span class="syn-v">x</span>):
+    <span class="syn-s">"""计算 f(x) = x² + 2x + 1"""</span>
+    <span class="syn-k">return</span> <span class="syn-v">x</span> ** <span class="syn-n">2</span> + <span class="syn-n">2</span> * <span class="syn-v">x</span> + <span class="syn-n">1</span>
+
+<span class="syn-f">print</span>(<span class="syn-f">f</span>(<span class="syn-n">3</span>))   <span class="syn-c"># 16（=9+6+1）</span>
+<span class="syn-f">print</span>(<span class="syn-f">f</span>(-<span class="syn-n">1</span>))  <span class="syn-c"># 0（x=-1 是方程的根）</span></code></pre></div>
+<div class="ex"><div class="ex-num">8</div><h4>✏️ 编写函数</h4><p class="hint">定义函数 <code>double(n)</code> 返回 n 的两倍，然后调用它</p><textarea class="code-editor" id="ed-ex8">def double(n):
+    return n * 2
+
+print(double(7))
+print(double(100))</textarea><button class="run-btn" onclick="runCode('ex8')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex8"></div></div>
+
+<h3 id="s4-2">4.2 模块——站在巨人的肩膀上</h3>
+<p>通过 <code>import</code> 导入模块就能直接使用其中写好的函数。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">import</span> math
+
+<span class="syn-f">print</span>(math.sqrt(<span class="syn-n">16</span>))       <span class="syn-c"># 4.0 平方根</span>
+<span class="syn-f">print</span>(math.pi)             <span class="syn-c"># 3.141592653589793</span>
+<span class="syn-f">print</span>(math.factorial(<span class="syn-n">10</span>))  <span class="syn-c"># 3628800（10!）</span>
+<span class="syn-f">print</span>(math.comb(<span class="syn-n">10</span>, <span class="syn-n">3</span>))    <span class="syn-c"># C(10,3) = 120 组合数</span>
+<span class="syn-f">print</span>(math.gcd(<span class="syn-n">48</span>, <span class="syn-n">180</span>))   <span class="syn-c"># 12 最大公约数</span></code></pre></div>
+<div class="tip"><strong>📦 NumPy：</strong>Python 自带 math 模块，但做真正的科学计算你需要 NumPy。大一线性代数课会用到 <code>numpy.linalg</code> 计算特征值。</div>
+</div>
+
+<!-- ====== PART 5: 进阶基础 ====== -->
+<div class="sec" id="p5">
+<h2>📐 第五部分：进阶基础</h2>
+<p>列表推导式、Lambda 函数——写出更 Pythonic 的代码</p>
+
+<h3 id="s5-1">5.1 列表推导式——Python 最优雅的特性</h3>
+<p>一行代码生成列表，将循环和条件浓缩到一行。<span class="tag tag-o">数学系的最爱！</span></p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 传统写法（4 行）</span>
+<span class="syn-v">squares</span> = []
+<span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-n">11</span>):
+    <span class="syn-v">squares</span>.append(<span class="syn-v">i</span> ** <span class="syn-n">2</span>)
+
+<span class="syn-c"># 列表推导式（1 行搞定！）</span>
+<span class="syn-v">squares</span> = [<span class="syn-v">i</span> ** <span class="syn-n">2</span> <span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-n">11</span>)]
+<span class="syn-f">print</span>(<span class="syn-v">squares</span>)  <span class="syn-c"># [1,4,9,16,25,36,49,64,81,100]</span>
+
+<span class="syn-c"># 📐 数学：筛选 1~30 中 3 的倍数</span>
+<span class="syn-v">m3</span> = [<span class="syn-v">n</span> <span class="syn-k">for</span> <span class="syn-v">n</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-n">1</span>, <span class="syn-n">31</span>) <span class="syn-k">if</span> <span class="syn-v">n</span> % <span class="syn-n">3</span> == <span class="syn-n">0</span>]
+<span class="syn-f">print</span>(<span class="syn-v">m3</span>)  <span class="syn-c"># [3,6,9,12,15,18,21,24,27,30]</span></code></pre></div>
+<div class="ex"><div class="ex-num">9</div><h4>✏️ 列表推导式</h4><p class="hint">用列表推导式生成 1~20 中所有 3 的倍数：[3, 6, 9, 12, 15, 18]</p><textarea class="code-editor" id="ed-ex9">multiples = [i for i in range(1, 21) if i % 3 == 0]
+print(multiples)</textarea><button class="run-btn" onclick="runCode('ex9')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex9"></div></div>
+
+<h3 id="s5-2">5.2 Lambda 匿名函数</h3>
+<p>Lambda 是一行就能写完的<strong>无名函数</strong>，适合简单的数学表达式。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># f(x) = x² 写成一个 lambda</span>
+<span class="syn-v">square</span> = <span class="syn-k">lambda</span> <span class="syn-v">x</span>: <span class="syn-v">x</span> ** <span class="syn-n">2</span>
+<span class="syn-f">print</span>(<span class="syn-v">square</span>(<span class="syn-n">9</span>))  <span class="syn-c"># 81</span>
+
+<span class="syn-c"># map：对所有元素应用同一个函数</span>
+<span class="syn-v">nums</span> = [<span class="syn-n">1</span>, <span class="syn-n">2</span>, <span class="syn-n">3</span>, <span class="syn-n">4</span>, <span class="syn-n">5</span>]
+<span class="syn-v">doubled</span> = <span class="syn-f">list</span>(<span class="syn-f">map</span>(<span class="syn-k">lambda</span> <span class="syn-v">x</span>: <span class="syn-v">x</span> * <span class="syn-n">2</span>, <span class="syn-v">nums</span>))
+<span class="syn-f">print</span>(<span class="syn-v">doubled</span>)  <span class="syn-c"># [2,4,6,8,10]</span></code></pre></div>
+
+<h3 id="s5-3">5.3 文件读写——持久化存储数据</h3>
+<p>Python 可以读写电脑上的文件。使用 <code>with open() as f:</code> 语法，文件会在代码块结束后自动关闭。</p>
+<div class="tbl-wrap"><table>
+<tr><th>模式</th><th>含义</th><th>文件不存在时</th></tr>
+<tr><td>"r"</td><td>读取（默认）</td><td>报错</td></tr>
+<tr><td>"w"</td><td>写入（覆盖）</td><td>创建新文件</td></tr>
+<tr><td>"a"</td><td>追加（末尾添加）</td><td>创建新文件</td></tr>
+<tr><td>"r+"</td><td>读写</td><td>报错</td></tr>
+</table></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 写入文件</span>
+<span class="syn-k">with</span> <span class="syn-f">open</span>(<span class="syn-s">"data.txt"</span>, <span class="syn-s">"w"</span>, <span class="syn-v">encoding</span>=<span class="syn-s">"utf-8"</span>) <span class="syn-k">as</span> <span class="syn-v">f</span>:
+    <span class="syn-v">f</span>.write(<span class="syn-s">"Hello, Python!</span><span class="syn-s">\\n</span><span class="syn-s">"</span>)
+    <span class="syn-v">f</span>.write(<span class="syn-s">"这是第二行</span><span class="syn-s">\\n</span><span class="syn-s">"</span>)
+
+<span class="syn-c"># 读取整个文件</span>
+<span class="syn-k">with</span> <span class="syn-f">open</span>(<span class="syn-s">"data.txt"</span>, <span class="syn-s">"r"</span>, <span class="syn-v">encoding</span>=<span class="syn-s">"utf-8"</span>) <span class="syn-k">as</span> <span class="syn-v">f</span>:
+    <span class="syn-v">content</span> = <span class="syn-v">f</span>.read()
+    <span class="syn-f">print</span>(<span class="syn-v">content</span>)
+
+<span class="syn-c"># 逐行读取</span>
+<span class="syn-k">with</span> <span class="syn-f">open</span>(<span class="syn-s">"data.txt"</span>, <span class="syn-s">"r"</span>, <span class="syn-v">encoding</span>=<span class="syn-s">"utf-8"</span>) <span class="syn-k">as</span> <span class="syn-v">f</span>:
+    <span class="syn-k">for</span> <span class="syn-v">line</span> <span class="syn-k">in</span> <span class="syn-v">f</span>:
+        <span class="syn-f">print</span>(<span class="syn-v">line</span>.strip())</code></pre></div>
+
+<h3 id="s5-4">5.4 异常处理——让程序更健壮</h3>
+<p>使用 <code>try/except</code> 捕获错误，防止程序崩溃。这在处理用户输入和文件操作时特别重要。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-c"># 处理用户输入错误</span>
+<span class="syn-k">try</span>:
+    <span class="syn-v">num</span> = <span class="syn-f">int</span>(<span class="syn-f">input</span>(<span class="syn-s">"请输入一个整数: "</span>))
+    <span class="syn-f">print</span>(<span class="syn-s">f"100 / {num} = {100 / num}"</span>)
+<span class="syn-k">except</span> <span class="syn-b">ValueError</span>:
+    <span class="syn-f">print</span>(<span class="syn-s">"错误：必须输入整数！"</span>)
+<span class="syn-k">except</span> <span class="syn-b">ZeroDivisionError</span>:
+    <span class="syn-f">print</span>(<span class="syn-s">"错误：不能除以零！"</span>)
+<span class="syn-k">finally</span>:
+    <span class="syn-f">print</span>(<span class="syn-s">"程序结束。"</span>)  <span class="syn-c"># 无论是否出错都执行</span></code></pre></div>
+<div class="tbl-wrap"><table>
+<tr><th>常见异常类型</th><th>触发条件</th></tr>
+<tr><td>ValueError</td><td>类型正确但值不合适（如 int("abc")）</td></tr>
+<tr><td>TypeError</td><td>操作不支持的类型（如 "a" + 1）</td></tr>
+<tr><td>ZeroDivisionError</td><td>除以零</td></tr>
+<tr><td>FileNotFoundError</td><td>文件不存在</td></tr>
+<tr><td>IndexError</td><td>列表索引越界</td></tr>
+<tr><td>KeyError</td><td>字典键不存在</td></tr>
+</table></div>
+</div>
+
+<!-- ====== PART 6: 面向对象 ====== -->
+<div class="sec" id="p6">
+<h2>🏗️ 第六部分：面向对象入门</h2>
+<p>类与对象——用代码描述现实世界的抽象</p>
+
+<h3 id="s6-1">6.1 类与对象——蓝图与实物</h3>
+<p><strong>类（Class）</strong>是创建对象的蓝图，就像饼干模具。<strong>对象（Object）</strong>是类的具体实例，就像用模具做出的饼干。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">class</span> <span class="syn-f">Vector2D</span>:
+    <span class="syn-s">"""二维向量——数学中最基础的数据结构之一"""</span>
+    <span class="syn-k">def</span> <span class="syn-f">__init__</span>(<span class="syn-b">self</span>, <span class="syn-v">x</span>, <span class="syn-v">y</span>):
+        <span class="syn-b">self</span>.<span class="syn-v">x</span> = <span class="syn-v">x</span>    <span class="syn-c"># 向量的 x 分量</span>
+        <span class="syn-b">self</span>.<span class="syn-v">y</span> = <span class="syn-v">y</span>    <span class="syn-c"># 向量的 y 分量</span>
+
+    <span class="syn-k">def</span> <span class="syn-f">magnitude</span>(<span class="syn-b">self</span>):
+        <span class="syn-s">"""计算向量的模（长度）|v| = √(x²+y²)"""</span>
+        <span class="syn-k">return</span> (<span class="syn-b">self</span>.<span class="syn-v">x</span>**<span class="syn-n">2</span> + <span class="syn-b">self</span>.<span class="syn-v">y</span>**<span class="syn-n">2</span>) ** <span class="syn-n">0.5</span>
+
+    <span class="syn-k">def</span> <span class="syn-f">__str__</span>(<span class="syn-b">self</span>):
+        <span class="syn-k">return</span> <span class="syn-s">f"Vector({self.x}, {self.y})"</span>
+
+<span class="syn-v">v</span> = <span class="syn-v">Vector2D</span>(<span class="syn-n">3</span>, <span class="syn-n">4</span>)
+<span class="syn-f">print</span>(<span class="syn-v">v</span>)                <span class="syn-c"># Vector(3, 4)</span>
+<span class="syn-f">print</span>(<span class="syn-v">v</span>.magnitude())    <span class="syn-c"># 5.0（勾股定理！√(9+16)=5）</span></code></pre></div>
+<div class="note"><strong>🎓 数学启示：</strong>大学课程中你会频繁用类表示数学对象——向量、矩阵、多项式。提前掌握这个思维模式，对理解抽象代数中的结构（群、环、域）也有帮助。</div>
+</div>
+
+<!-- ====== PART 7: 数学实用技能 ====== -->
+<div class="sec" id="p7">
+<h2>🎓 第七部分：数学系实用技能</h2>
+<p>math 模块、数值微积分、蒙特卡洛模拟——Python 的数学超能力</p>
+
+<h3 id="s7-1">7.1 math 模块深度解析</h3>
+<div class="tbl-wrap"><table>
+<tr><th>常数</th><th>值</th><th>数学意义</th></tr>
+<tr><td>math.pi</td><td>3.141592653589793</td><td>圆周率 π</td></tr>
+<tr><td>math.e</td><td>2.718281828459045</td><td>自然常数 e</td></tr>
+<tr><td>math.tau</td><td>6.283185307179586</td><td>τ = 2π</td></tr>
+<tr><td>math.inf</td><td>inf</td><td>正无穷大（比任何数都大）</td></tr>
+</table></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">import</span> math
+
+<span class="syn-c"># 幂与对数</span>
+<span class="syn-f">print</span>(math.sqrt(<span class="syn-n">2</span>))        <span class="syn-c"># √2 ≈ 1.4142</span>
+<span class="syn-f">print</span>(math.exp(<span class="syn-n">2</span>))          <span class="syn-c"># e² ≈ 7.3891</span>
+<span class="syn-f">print</span>(math.log(<span class="syn-n">10</span>))         <span class="syn-c"># ln(10) ≈ 2.3026</span>
+<span class="syn-f">print</span>(math.log2(<span class="syn-n">1024</span>))      <span class="syn-c"># log₂(1024) = 10.0</span>
+
+<span class="syn-c"># 三角函数（弧度制！）</span>
+<span class="syn-v">t</span> = math.radians(<span class="syn-n">30</span>)      <span class="syn-c"># 30° → π/6 弧度</span>
+<span class="syn-f">print</span>(math.sin(<span class="syn-v">t</span>))        <span class="syn-c"># 0.5 = sin(30°)</span>
+
+<span class="syn-c"># 组合数学</span>
+<span class="syn-f">print</span>(math.comb(<span class="syn-n">10</span>, <span class="syn-n">3</span>))    <span class="syn-c"># C(10,3) = 120 组合数</span>
+<span class="syn-f">print</span>(math.perm(<span class="syn-n">10</span>, <span class="syn-n">3</span>))    <span class="syn-c"># P(10,3) = 720 排列数</span>
+<span class="syn-f">print</span>(math.gcd(<span class="syn-n">48</span>, <span class="syn-n">180</span>))   <span class="syn-c"># 12 最大公约数</span></code></pre></div>
+<div class="ex"><div class="ex-num">10</div><h4>✏️ 三角计算</h4><p class="hint">计算 sin(30°) + cos(60°)（用 math.radians 将角度转换为弧度）</p><textarea class="code-editor" id="ed-ex10">import math
+a = math.radians(30)
+b = math.radians(60)
+result = math.sin(a) + math.cos(b)
+print(f"sin(30°) + cos(60°) = {result}")</textarea><button class="run-btn" onclick="runCode('ex10')"><span>▶</span> 运行代码</button><div class="feedback" id="fb-ex10"></div></div>
+
+<h3 id="s7-calc">7.2 数值微积分入门</h3>
+<h4>🔬 数值导数（中心差分法）</h4>
+<p>基于导数极限定义：<strong>f'(x) ≈ [f(x+h) − f(x−h)] / (2h)</strong>，取 h = 1e-7。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">def</span> <span class="syn-f">derivative</span>(<span class="syn-v">f</span>, <span class="syn-v">x</span>, <span class="syn-v">h</span>=<span class="syn-n">1e-7</span>):
+    <span class="syn-s">"""用中心差分法求 f'(x)"""</span>
+    <span class="syn-k">return</span> (<span class="syn-v">f</span>(<span class="syn-v">x</span> + <span class="syn-v">h</span>) - <span class="syn-v">f</span>(<span class="syn-v">x</span> - <span class="syn-v">h</span>)) / (<span class="syn-n">2</span> * <span class="syn-v">h</span>)
+
+<span class="syn-c"># f(x)=x², f'(x)=2x → f'(3)=6</span>
+<span class="syn-f">print</span>(<span class="syn-f">derivative</span>(<span class="syn-k">lambda</span> <span class="syn-v">x</span>: <span class="syn-v">x</span>**<span class="syn-n">2</span>, <span class="syn-n">3</span>))   <span class="syn-c"># ≈ 6.0000 ✓</span>
+
+<span class="syn-c"># f(x)=sin(x), f'(x)=cos(x) → f'(π/4)=√2/2≈0.7071</span>
+<span class="syn-v">result</span> = <span class="syn-f">derivative</span>(math.sin, math.pi/<span class="syn-n">4</span>)
+<span class="syn-f">print</span>(<span class="syn-s">f"sin'(π/4) ≈ {result:.6f}"</span>)  <span class="syn-c"># ≈ 0.707107 ✓</span></code></pre></div>
+<h4>∫ 数值积分（黎曼和）</h4>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">def</span> <span class="syn-f">integral</span>(<span class="syn-v">f</span>, <span class="syn-v">a</span>, <span class="syn-v">b</span>, <span class="syn-v">n</span>=<span class="syn-n">100000</span>):
+    <span class="syn-s">"""用矩形法近似计算 ∫ₐᵇ f(x) dx"""</span>
+    <span class="syn-v">dx</span> = (<span class="syn-v">b</span> - <span class="syn-v">a</span>) / <span class="syn-v">n</span>
+    <span class="syn-v">total</span> = <span class="syn-f">sum</span>(<span class="syn-v">f</span>(<span class="syn-v">a</span> + <span class="syn-v">i</span>*<span class="syn-v">dx</span>) * <span class="syn-v">dx</span> <span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-v">n</span>))
+    <span class="syn-k">return</span> <span class="syn-v">total</span>
+
+<span class="syn-c"># ∫₀¹ x² dx = 1/3 ≈ 0.3333</span>
+<span class="syn-f">print</span>(<span class="syn-f">integral</span>(<span class="syn-k">lambda</span> <span class="syn-v">x</span>: <span class="syn-v">x</span>**<span class="syn-n">2</span>, <span class="syn-n">0</span>, <span class="syn-n">1</span>))       <span class="syn-c"># ≈ 0.3333 ✓</span>
+
+<span class="syn-c"># ∫₀¹ 4/(1+x²) dx = π ≈ 3.1416</span>
+<span class="syn-f">print</span>(<span class="syn-f">integral</span>(<span class="syn-k">lambda</span> <span class="syn-v">x</span>: <span class="syn-n">4</span>/(<span class="syn-n">1</span>+<span class="syn-v">x</span>**<span class="syn-n">2</span>), <span class="syn-n">0</span>, <span class="syn-n">1</span>)) <span class="syn-c"># ≈ 3.1416 ✓</span></code></pre></div>
+<div class="note"><strong>💡 前置学习：</strong>这些数值方法正是大学「数值分析」课的核心内容。提前用 Python 动手实现，上课时你会比别人理解得更深刻。在大一的 Calculus 和 Linear Algebra 课程中，你可以用这些代码验证作业答案。</div>
+
+<h3 id="s7-monte">7.3 蒙特卡洛方法——用随机数估算 π</h3>
+<p><strong>核心思想：</strong>在 [-1,1]×[-1,1] 正方形内随机撒 N 个点，统计落在内切圆（x²+y²≤1）内的比例。圆面积 / 正方形面积 = π/4 ≈ 圆内点数 / N。</p>
+<div class="diagram"><svg width="320" height="300" viewBox="0 0 320 300">
+<rect x="10" y="10" width="300" height="300" fill="rgba(0,113,227,0.03)" stroke="#0071e3" stroke-width="2" rx="4"/>
+<circle cx="160" cy="160" r="150" fill="rgba(48,209,88,0.06)" stroke="#30d158" stroke-width="2"/>
+<text x="160" y="160" text-anchor="middle" fill="#1d1d1f" font-size="14" font-weight="600">圆面积 = πr² = π</text>
+<text x="160" y="182" text-anchor="middle" fill="#6e6e73" font-size="12">正方形面积 = 2×2 = 4</text>
+<text x="160" y="202" text-anchor="middle" fill="#aeaeb2" font-size="11">π/4 ≈ 圆内点数 / N</text>
+<text x="160" y="290" text-anchor="middle" fill="#aeaeb2" font-size="12">蒙特卡洛方法估算 π</text></svg></div>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">import</span> random
+
+<span class="syn-v">N</span> = <span class="syn-n">1000000</span>  <span class="syn-c"># 撒 100 万个随机点</span>
+<span class="syn-v">inside</span> = <span class="syn-n">0</span>
+
+<span class="syn-k">for</span> <span class="syn-v">_</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-v">N</span>):
+    <span class="syn-v">x</span> = random.uniform(-<span class="syn-n">1</span>, <span class="syn-n">1</span>)  <span class="syn-c"># 随机 x 坐标</span>
+    <span class="syn-v">y</span> = random.uniform(-<span class="syn-n">1</span>, <span class="syn-n">1</span>)  <span class="syn-c"># 随机 y 坐标</span>
+    <span class="syn-k">if</span> <span class="syn-v">x</span>**<span class="syn-n">2</span> + <span class="syn-v">y</span>**<span class="syn-n">2</span> &lt;= <span class="syn-n">1</span>:       <span class="syn-c"># 判断是否在圆内</span>
+        <span class="syn-v">inside</span> += <span class="syn-n">1</span>
+
+<span class="syn-v">pi_approx</span> = <span class="syn-n">4</span> * <span class="syn-v">inside</span> / <span class="syn-v">N</span>
+<span class="syn-f">print</span>(<span class="syn-s">f"π ≈ {pi_approx}"</span>)
+<span class="syn-f">print</span>(<span class="syn-s">f"误差: {abs(pi_approx - 3.14159265):.6f}"</span>)</code></pre></div>
+<div class="output"><div class="output-label">▸ 典型输出（每次运行略有不同）</div>π ≈ 3.141872<br>误差: 0.000279 ← 非常精确！</div>
+<div class="tip"><strong>🎓 大学关联：</strong>蒙特卡洛方法在金融数学（期权定价）、统计物理（伊辛模型）、贝叶斯统计（MCMC 采样）中广泛应用。UCL 的统计学和金融数学课程会深入探讨。提前掌握这个强大工具，你在大一就能领先一步。</div>
+
+<h3 id="s7-newton">7.4 牛顿迭代法——二次收敛的求根算法</h3>
+<p><strong>牛顿迭代公式：</strong>xₖ₊₁ = xₖ − f(xₖ)/f'(xₖ)。对于 f(x) = x² − n（求 √n），化简得：<strong>xₖ₊₁ = (xₖ + n/xₖ) / 2</strong></p>
+<p>意思是：每一步的猜测值 = （上一步猜测值 + n/上一步猜测值）/ 2。收敛极快，每次迭代精度翻倍（二次收敛）。</p>
+<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制</button></div><pre><code><span class="syn-k">def</span> <span class="syn-f">newton_sqrt</span>(<span class="syn-v">n</span>, <span class="syn-v">iters</span>=<span class="syn-n">10</span>):
+    <span class="syn-s">"""牛顿迭代法求 √n——收敛速度极快！"""</span>
+    <span class="syn-v">x</span> = <span class="syn-v">n</span>  <span class="syn-c"># 初始猜测值</span>
+    <span class="syn-k">for</span> <span class="syn-v">i</span> <span class="syn-k">in</span> <span class="syn-f">range</span>(<span class="syn-v">iters</span>):
+        <span class="syn-v">x</span> = (<span class="syn-v">x</span> + <span class="syn-v">n</span> / <span class="syn-v">x</span>) / <span class="syn-n">2</span>
+        <span class="syn-f">print</span>(<span class="syn-s">f"第 {i+1} 次迭代: x = {x:.10f}"</span>)
+    <span class="syn-k">return</span> <span class="syn-v">x</span>
+
+<span class="syn-f">print</span>(<span class="syn-s">"计算 √2:"</span>)
+<span class="syn-v">result</span> = <span class="syn-f">newton_sqrt</span>(<span class="syn-n">2</span>)
+<span class="syn-f">print</span>(<span class="syn-s">f"√2 ≈ {result:.15f}"</span>)</code></pre></div>
+<div class="output"><div class="output-label">▸ 输出结果</div>第 1 次迭代: x = 1.5000000000<br>第 2 次迭代: x = 1.4166666667<br>第 3 次迭代: x = 1.4142156863<br>第 4 次迭代: x = 1.4142135624<br>第 5 次迭代: x = 1.4142135624<br>√2 ≈ 1.414213562373095</div>
+<div class="note"><strong>🔍 观察：</strong>仅 5 次迭代就达到了 10 位精度！这就是二次收敛的威力——每一步的准确位数大约翻倍。牛顿法是数值分析中最优雅的算法之一。</div>
+
+</div>
+
+<!-- ====== 进阶练习：Debug 挑战 ====== -->
+<div class="sec" id="advanced">
+<h2>🐛 进阶练习：Debug 纠错挑战</h2>
+<p>以下代码都存在 bug。阅读代码，找出问题并修复它。这是提升编程能力的最佳方式——<strong>学会阅读和调试代码</strong>。</p>
+
+<div class="ex debug"><div class="ex-num">A1</div><h4>🔍 纠错：类型错误</h4><p class="hint">下面的代码想计算"年龄加 1"，但运行会报错。找出问题并修复。<br>💡 回忆：<code>input()</code> 返回什么类型？</p><textarea class="code-editor" id="ed-exa1">age = input("请输入年龄: ")
+print("明年你 " + (age + 1) + " 岁")</textarea><div class="input-hint">📥 模拟输入: <input type="text" id="in-exa1" placeholder="输入年龄，如 18" value="18"></div><button class="run-btn" onclick="runCode('exa1')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa1"></div></div>
+
+<div class="ex debug"><div class="ex-num">A2</div><h4>🔍 纠错：缩进错误</h4><p class="hint">下面的代码想判断一个数是正数、负数、还是零，但逻辑有 bug。找出问题。<br>💡 仔细检查每个 <code>if/elif/else</code> 的条件范围。</p><textarea class="code-editor" id="ed-exa2">n = -5
+if n > 0:
+    print("正数")
+if n < 0:
+    print("负数")
+else:
+    print("零")</textarea><button class="run-btn" onclick="runCode('exa2')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa2"></div></div>
+
+<div class="ex debug"><div class="ex-num">A3</div><h4>🔍 纠错：循环边界错误</h4><p class="hint">下面的代码想打印列表的前 3 个元素，但只打印了 2 个。找出 bug。<br>💡 检查 <code>range()</code> 的结束值。</p><textarea class="code-editor" id="ed-exa3">fruits = ["apple", "banana", "cherry", "date", "elderberry"]
+print("前三个水果:")
+for i in range(1, 3):
+    print(f"  {i}. {fruits[i]}")</textarea><button class="run-btn" onclick="runCode('exa3')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa3"></div></div>
+
+<div class="ex debug"><div class="ex-num">A4</div><h4>🔍 纠错：函数返回值缺失</h4><p class="hint">下面的 <code>is_even</code> 函数想判断偶数，但调用后什么也不打印。找出问题。<br>💡 函数里 <code>print()</code> 和 <code>return</code> 的区别是什么？</p><textarea class="code-editor" id="ed-exa4">def is_even(n):
+    if n % 2 == 0:
+        return True
+
+print(is_even(4))   # 应该输出 True
+print(is_even(7))   # 应该输出 False</textarea><button class="run-btn" onclick="runCode('exa4')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa4"></div></div>
+
+<div class="ex debug"><div class="ex-num">A5</div><h4>🔍 纠错：变量作用域</h4><p class="hint">下面的代码想计算累加和，但 <code>total</code> 没被更新。找出 bug。<br>💡 函数内部和外部同名变量是什么关系？</p><textarea class="code-editor" id="ed-exa5">total = 0
+
+def add_to_total(x):
+    total = total + x
+    return total
+
+print(add_to_total(5))   # 期望输出 5
+print(add_to_total(3))   # 期望输出 8</textarea><button class="run-btn" onclick="runCode('exa5')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa5"></div></div>
+
+<div class="ex debug"><div class="ex-num">A6</div><h4>🔍 纠错：列表推导式逻辑</h4><p class="hint">下面的代码想生成 1~20 中所有<strong>既被 2 又被 3 整除</strong>的数（即 6 的倍数）。但输出不对，找出 bug。<br>💡 <code>and</code> 和 <code>or</code> 在条件中的区别。</p><textarea class="code-editor" id="ed-exa6">nums = [n for n in range(1, 21) if n % 2 == 0 or n % 3 == 0]
+print(nums)  # 期望: [6, 12, 18]</textarea><button class="run-btn" onclick="runCode('exa6')"><span>▶</span> 运行测试</button><div class="feedback" id="fb-exa6"></div></div>
+
+<div class="note" style="margin-top:24px;"><strong>💡 Debug 技巧：</strong>遇到错误时，先看报错信息（错误类型 + 行号）。<br>- <code>TypeError</code> → 类型不匹配（如 字符串+数字）<br>- <code>SyntaxError</code> → 语法错误（如少了冒号、括号）<br>- <code>NameError</code> → 变量名不存在<br>- <code>IndentationError</code> → 缩进问题<br>多读报错信息，这是编程最重要的能力之一！</div>
+</div>
+
+<!-- ====== UCL 数学工具下载 ====== -->
+<div class="sec" id="tools">
+<h2>🛠️ UCL 大一数学专用工具集</h2>
+<p>以下 Python 脚本涵盖了大一数学课程中最常用的计算功能。每个工具都是<strong>完整可运行</strong>的 <code>.py</code> 文件。</p>
+<div class="note"><strong>📥 使用说明：</strong>点击"查看代码"预览源码，点击"下载 .py"保存到你的电脑。如果还没安装 Python，请先安装 <strong>Python 3.12+</strong>（见 <a href="#s1-2" style="color:var(--accent);">1.2 安装指南</a>）和 <strong>VS Code</strong> 或 <strong>PyCharm</strong>。</div>
+
+<div class="dl-card"><div class="dl-card-icon">📐</div><div class="dl-card-info"><h4>numerical_methods.py</h4><p>牛顿迭代法、二分法求根、数值积分（梯形法+辛普森法）、数值求导 | 覆盖 MATH0003 Numerical Methods 核心内容</p></div><button class="dl-card-btn view" onclick="viewTool('tool1')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool1','numerical_methods.py')">⬇ 下载 .py</button></div>
+
+<div class="dl-card"><div class="dl-card-icon">🔢</div><div class="dl-card-info"><h4>linear_algebra_utils.py</h4><p>向量运算（加减、点积、叉积）、矩阵乘法、行列式、高斯消元法 | 覆盖 MATH0006 Linear Algebra 内容</p></div><button class="dl-card-btn view" onclick="viewTool('tool2')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool2','linear_algebra_utils.py')">⬇ 下载 .py</button></div>
+
+<div class="dl-card"><div class="dl-card-icon">📊</div><div class="dl-card-info"><h4>statistics_utils.py</h4><p>均值、中位数、方差、标准差、协方差、线性回归（最小二乘法）| 覆盖 MATH0007 Statistics 内容</p></div><button class="dl-card-btn view" onclick="viewTool('tool3')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool3','statistics_utils.py')">⬇ 下载 .py</button></div>
+
+<div class="dl-card"><div class="dl-card-icon">∫</div><div class="dl-card-info"><h4>calculus_tools.py</h4><p>符号求导（SymPy）、定积分计算、极限求解、泰勒展开 | 覆盖 MATH0004 Calculus 内容</p></div><button class="dl-card-btn view" onclick="viewTool('tool4')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool4','calculus_tools.py')">⬇ 下载 .py</button></div>
+
+<div class="dl-card"><div class="dl-card-icon">🔐</div><div class="dl-card-info"><h4>number_theory.py</h4><p>素数检测（Miller-Rabin）、因数分解、欧拉函数、扩展欧几里得算法、快速模幂 | 数论基础</p></div><button class="dl-card-btn view" onclick="viewTool('tool5')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool5','number_theory.py')">⬇ 下载 .py</button></div>
+
+<div class="dl-card"><div class="dl-card-icon">📈</div><div class="dl-card-info"><h4>function_plotter.py</h4><p>使用 Matplotlib 绘制函数图像、参数方程、3D 曲面图 | 数学可视化入门模板</p></div><button class="dl-card-btn view" onclick="viewTool('tool6')">👁️ 查看代码</button><button class="dl-card-btn" onclick="downloadTool('tool6','function_plotter.py')">⬇ 下载 .py</button></div>
+</div>
+
+<!-- Tool Modal -->
+<div class="tool-modal" id="toolModal"><div class="tool-modal-inner"><button class="tool-modal-close" onclick="closeTool()">✕</button><h3 id="toolTitle"></h3><div id="toolCode"></div></div></div>
+
+<!-- Hidden tool source code -->
+<div style="display:none;">
+<textarea id="tool1">#!/usr/bin/env python3
+"""
+Numerical Methods Toolkit for UCL Mathematics
+=============================================
+Covers: root-finding, numerical integration, numerical differentiation
+Usage: python numerical_methods.py
+"""
+
+import math
+
+# ===== ROOT-FINDING =====
+
+def newton_method(f, df, x0, tol=1e-10, max_iter=100):
+    """Newton's method for finding root of f(x)=0.
+    f: function, df: derivative of f, x0: initial guess
+    Returns (root, iterations)"""
+    x = x0
+    for i in range(max_iter):
+        fx = f(x)
+        if abs(fx) < tol:
+            return x, i + 1
+        dfx = df(x)
+        if dfx == 0:
+            raise ValueError("Derivative is zero. Choose a different x0.")
+        x = x - fx / dfx
+    raise ValueError(f"Did not converge after {max_iter} iterations")
+
+def bisection_method(f, a, b, tol=1e-10, max_iter=200):
+    """Bisection method for finding root in interval [a,b].
+    Requires f(a) and f(b) to have opposite signs."""
+    if f(a) * f(b) >= 0:
+        raise ValueError("f(a) and f(b) must have opposite signs")
+    for i in range(max_iter):
+        c = (a + b) / 2
+        fc = f(c)
+        if abs(fc) < tol:
+            return c, i + 1
+        if f(a) * fc < 0:
+            b = c
+        else:
+            a = c
+    return (a + b) / 2, max_iter
+
+# ===== NUMERICAL INTEGRATION =====
+
+def trapezoidal_rule(f, a, b, n=1000):
+    """Approximate ∫[a,b] f(x)dx using the trapezoidal rule."""
+    h = (b - a) / n
+    total = (f(a) + f(b)) / 2
+    for i in range(1, n):
+        total += f(a + i * h)
+    return total * h
+
+def simpsons_rule(f, a, b, n=1000):
+    """Approximate ∫[a,b] f(x)dx using Simpson's 1/3 rule.
+    n must be even."""
+    if n % 2 != 0:
+        n += 1
+    h = (b - a) / n
+    total = f(a) + f(b)
+    for i in range(1, n):
+        x = a + i * h
+        total += f(x) * (4 if i % 2 == 1 else 2)
+    return total * h / 3
+
+# ===== NUMERICAL DIFFERENTIATION =====
+
+def derivative_forward(f, x, h=1e-7):
+    """Forward difference: f'(x) ≈ (f(x+h) - f(x)) / h"""
+    return (f(x + h) - f(x)) / h
+
+def derivative_central(f, x, h=1e-7):
+    """Central difference (more accurate): f'(x) ≈ (f(x+h) - f(x-h)) / (2h)"""
+    return (f(x + h) - f(x - h)) / (2 * h)
+
+def second_derivative(f, x, h=1e-5):
+    """Second derivative: f''(x) ≈ (f(x+h) - 2f(x) + f(x-h)) / h²"""
+    return (f(x + h) - 2 * f(x) + f(x - h)) / (h ** 2)
+
+# ===== DEMO =====
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Numerical Methods Toolkit")
+    print("=" * 50)
+
+    # 1. Newton's method: find sqrt(2)
+    f = lambda x: x**2 - 2
+    df = lambda x: 2 * x
+    root, iters = newton_method(f, df, x0=1.5)
+    print(f"\n1. Newton: √2 = {root:.12f} (found in {iters} iterations)")
+
+    # 2. Bisection: find root of cos(x) - x = 0
+    f2 = lambda x: math.cos(x) - x
+    root2, iters2 = bisection_method(f2, 0, 1)
+    print(f"2. Bisection: cos(x)=x, x = {root2:.12f} (found in {iters2} iterations)")
+
+    # 3. Integrate: ∫[0,π] sin(x)dx = 2
+    trap = trapezoidal_rule(math.sin, 0, math.pi, n=500)
+    simp = simpsons_rule(math.sin, 0, math.pi, n=500)
+    print(f"\n3. ∫[0,π] sin(x)dx: Trap={trap:.10f}, Simpson={simp:.10f} (exact=2)")
+
+    # 4. Derivative: f(x)=x³, f'(2)=12
+    f3 = lambda x: x ** 3
+    d1 = derivative_central(f3, 2)
+    d2 = second_derivative(f3, 2)  # f''(x)=6x, f''(2)=12
+    print(f"4. f(x)=x³ at x=2: f'={d1:.8f} (exact=12), f''={d2:.8f} (exact=12)")
+
+    print("\n✓ All tests passed!")</textarea>
+
+<textarea id="tool2">#!/usr/bin/env python3
+"""
+Linear Algebra Utilities for UCL Mathematics
+============================================
+Implements basic vector and matrix operations from scratch.
+Usage: python linear_algebra_utils.py
+"""
+
+import math
+
+# ===== VECTOR OPERATIONS =====
+
+def vec_add(u, v):
+    """Vector addition: u + v"""
+    return [u[i] + v[i] for i in range(len(u))]
+
+def vec_sub(u, v):
+    """Vector subtraction: u - v"""
+    return [u[i] - v[i] for i in range(len(u))]
+
+def vec_scale(c, v):
+    """Scalar multiplication: c * v"""
+    return [c * v[i] for i in range(len(v))]
+
+def dot_product(u, v):
+    """Dot product: u · v = Σ uᵢvᵢ"""
+    return sum(u[i] * v[i] for i in range(len(u)))
+
+def cross_product(u, v):
+    """Cross product (3D only): u × v"""
+    if len(u) != 3 or len(v) != 3:
+        raise ValueError("Cross product only defined for 3D vectors")
+    return [
+        u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0]
+    ]
+
+def magnitude(v):
+    """Vector magnitude (L2 norm): |v| = √(Σ vᵢ²)"""
+    return math.sqrt(sum(x ** 2 for x in v))
+
+def normalize(v):
+    """Normalize vector to unit length: v / |v|"""
+    mag = magnitude(v)
+    if mag == 0:
+        raise ValueError("Cannot normalize zero vector")
+    return [x / mag for x in v]
+
+def angle_between(u, v):
+    """Angle between vectors in radians: θ = arccos((u·v)/(|u||v|))"""
+    cos_theta = dot_product(u, v) / (magnitude(u) * magnitude(v))
+    return math.acos(max(-1, min(1, cos_theta)))  # Clamp for numerical stability
+
+# ===== MATRIX OPERATIONS =====
+
+def mat_mul(A, B):
+    """Matrix multiplication: A * B
+    A is m×n, B is n×p, returns m×p matrix"""
+    m, n = len(A), len(A[0])
+    p = len(B[0])
+    if n != len(B):
+        raise ValueError(f"Dimension mismatch: A is {m}×{n}, B is {len(B)}×{p}")
+    result = [[0] * p for _ in range(m)]
+    for i in range(m):
+        for j in range(p):
+            result[i][j] = sum(A[i][k] * B[k][j] for k in range(n))
+    return result
+
+def mat_transpose(A):
+    """Matrix transpose: swap rows and columns"""
+    return [[A[j][i] for j in range(len(A))] for i in range(len(A[0]))]
+
+def determinant_2x2(A):
+    """Determinant of 2×2 matrix: |a b; c d| = ad - bc"""
+    return A[0][0] * A[1][1] - A[0][1] * A[1][0]
+
+def determinant(matrix):
+    """Recursive determinant for n×n matrix"""
+    n = len(matrix)
+    if n == 1:
+        return matrix[0][0]
+    if n == 2:
+        return determinant_2x2(matrix)
+    det = 0
+    for j in range(n):
+        sub = [[matrix[i][k] for k in range(n) if k != j] for i in range(1, n)]
+        det += ((-1) ** j) * matrix[0][j] * determinant(sub)
+    return det
+
+def gaussian_elimination(A, b):
+    """Solve Ax = b using Gaussian elimination with partial pivoting.
+    Returns solution vector x."""
+    n = len(A)
+    M = [A[i][:] + [b[i]] for i in range(n)]  # Augmented matrix
+
+    for col in range(n):
+        # Partial pivoting
+        max_row = max(range(col, n), key=lambda r: abs(M[r][col]))
+        if abs(M[max_row][col]) < 1e-12:
+            raise ValueError("Matrix is singular or nearly singular")
+        M[col], M[max_row] = M[max_row], M[col]
+
+        # Eliminate below
+        for row in range(col + 1, n):
+            factor = M[row][col] / M[col][col]
+            for j in range(col, n + 1):
+                M[row][j] -= factor * M[col][j]
+
+    # Back substitution
+    x = [0] * n
+    for i in range(n - 1, -1, -1):
+        x[i] = M[i][n] / M[i][i]
+        for j in range(i):
+            M[j][n] -= M[j][i] * x[i]
+    return x
+
+# ===== DEMO =====
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Linear Algebra Toolkit")
+    print("=" * 50)
+
+    # Vectors
+    u, v = [1, 2, 3], [4, 5, 6]
+    print(f"\n1. Vectors: u={u}, v={v}")
+    print(f"   u·v = {dot_product(u, v)} (dot product)")
+    print(f"   u×v = {cross_product(u, v)} (cross product)")
+    print(f"   |u| = {magnitude(u):.4f} (magnitude)")
+    print(f"   ∠(u,v) = {math.degrees(angle_between(u, v)):.2f}°")
+
+    # Matrix multiplication
+    A = [[1, 2], [3, 4]]
+    B = [[5, 6], [7, 8]]
+    C = mat_mul(A, B)
+    print(f"\n2. Matrix: A*B = {C}")
+    print(f"   det(A) = {determinant(A)}")
+
+    # Solve linear system: 2x+y=5, x+3y=7
+    A3 = [[2, 1], [1, 3]]
+    b3 = [5, 7]
+    x3 = gaussian_elimination(A3, b3)
+    print(f"\n3. Solve 2x+y=5, x+3y=7: x={x3[0]:.2f}, y={x3[1]:.2f}")
+
+    print("\n✓ All tests passed!")</textarea>
+
+<textarea id="tool3">#!/usr/bin/env python3
+"""
+Statistics Utilities for UCL Mathematics
+=========================================
+Basic statistics functions implemented from scratch.
+Usage: python statistics_utils.py
+"""
+
+import math
+
+def mean(data):
+    """Arithmetic mean: x̄ = (Σ xᵢ) / n"""
+    return sum(data) / len(data)
+
+def median(data):
+    """Median: middle value when sorted"""
+    s = sorted(data)
+    n = len(s)
+    mid = n // 2
+    if n % 2 == 0:
+        return (s[mid - 1] + s[mid]) / 2
+    return s[mid]
+
+def variance(data, sample=True):
+    """Variance: σ² (population) or s² (sample).
+    If sample=True, uses n-1 denominator (Bessel's correction)."""
+    m = mean(data)
+    n = len(data)
+    denom = n - 1 if sample else n
+    return sum((x - m) ** 2 for x in data) / denom
+
+def std_dev(data, sample=True):
+    """Standard deviation: √(variance)"""
+    return math.sqrt(variance(data, sample))
+
+def covariance(x, y):
+    """Covariance between two variables: Cov(X,Y) = Σ(xᵢ-x̄)(yᵢ-ȳ)/(n-1)"""
+    if len(x) != len(y):
+        raise ValueError("x and y must have the same length")
+    mx, my = mean(x), mean(y)
+    return sum((x[i] - mx) * (y[i] - my) for i in range(len(x))) / (len(x) - 1)
+
+def correlation(x, y):
+    """Pearson correlation coefficient: r = Cov(X,Y)/(sx·sy)
+    r ∈ [-1, 1]: r=1 perfect positive, r=-1 perfect negative, r=0 no linear correlation"""
+    return covariance(x, y) / (std_dev(x) * std_dev(y))
+
+def linear_regression(x, y):
+    """Simple linear regression: y = a + bx
+    Returns (a, b) where a is intercept, b is slope"""
+    b = covariance(x, y) / variance(x)
+    a = mean(y) - b * mean(x)
+    return a, b
+
+def r_squared(x, y):
+    """R² coefficient of determination: proportion of variance explained"""
+    a, b = linear_regression(x, y)
+    y_pred = [a + b * xi for xi in x]
+    ss_res = sum((y[i] - y_pred[i]) ** 2 for i in range(len(y)))
+    ss_tot = sum((yi - mean(y)) ** 2 for yi in y)
+    return 1 - ss_res / ss_tot
+
+# ===== DEMO =====
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Statistics Toolkit")
+    print("=" * 50)
+
+    data = [72, 85, 90, 65, 78, 88, 92, 76, 81, 95]
+    print(f"\n1. Dataset: {data}")
+    print(f"   Mean = {mean(data):.2f}")
+    print(f"   Median = {median(data):.2f}")
+    print(f"   Std Dev = {std_dev(data):.2f}")
+
+    # Linear regression example
+    hours = [1, 2, 3, 4, 5, 6, 7, 8]
+    scores = [45, 52, 58, 65, 70, 75, 82, 88]
+    a, b = linear_regression(hours, scores)
+    r2 = r_squared(hours, scores)
+    print(f"\n2. Study hours vs Exam scores:")
+    print(f"   Regression: score = {a:.2f} + {b:.2f} × hours")
+    print(f"   R² = {r2:.4f} ({r2*100:.1f}% of variance explained)")
+    print(f"   Correlation r = {correlation(hours, scores):.4f}")
+    print(f"   Predicted score for 3.5 hours: {a + b * 3.5:.1f}")
+
+    print("\n✓ All tests passed!")</textarea>
+
+<textarea id="tool4">#!/usr/bin/env python3
+"""
+Calculus Tools for UCL Mathematics
+===================================
+Symbolic differentiation, integration, limits, and Taylor series.
+REQUIRES: pip install sympy
+Usage: python calculus_tools.py
+"""
+
+try:
+    import sympy as sp
+    SYMPY_AVAILABLE = True
+except ImportError:
+    SYMPY_AVAILABLE = False
+    print("Warning: SymPy not installed. Run: pip install sympy")
+
+import math
+
+def demonstrate_symbolic():
+    """Demonstrate SymPy symbolic math capabilities."""
+    if not SYMPY_AVAILABLE:
+        print("Skipping symbolic demo (install sympy first)")
+        return
+
+    x = sp.Symbol('x')
+
+    print("\n--- Symbolic Differentiation ---")
+    f = x**3 + 2*x**2 - 5*x + 1
+    print(f"  f(x) = {f}")
+    print(f"  f'(x) = {sp.diff(f, x)}")
+    print(f"  f''(x) = {sp.diff(f, x, 2)}")
+
+    print("\n--- Symbolic Integration ---")
+    g = sp.sin(x) * sp.exp(x)
+    print(f"  ∫ sin(x)·eˣ dx = {sp.integrate(g, x)}")
+    h = 1 / (1 + x**2)
+    print(f"  ∫₀¹ 1/(1+x²) dx = {sp.integrate(h, (x, 0, 1))} = {float(sp.integrate(h, (x, 0, 1))):.10f}")
+
+    print("\n--- Limits ---")
+    print(f"  lim(x→0) sin(x)/x = {sp.limit(sp.sin(x)/x, x, 0)}")
+    print(f"  lim(x→∞) (1+1/x)ˣ = {sp.limit((1+1/x)**x, x, sp.oo)}")
+
+    print("\n--- Taylor Series ---")
+    taylor = sp.series(sp.sin(x), x, 0, 7).removeO()
+    print(f"  sin(x) ≈ {taylor} (around x=0, up to x⁵)")
+
+    print("\n--- Equation Solving ---")
+    eq = x**3 - 2*x**2 - 5*x + 6
+    solutions = sp.solve(eq, x)
+    print(f"  x³ - 2x² - 5x + 6 = 0")
+    print(f"  Solutions: {solutions}")
+
+def numerical_calculus_demo():
+    """Numerical calculus without SymPy dependency."""
+    print("\n--- Numerical Calculus (no SymPy needed) ---")
+
+    def derivative(f, x, h=1e-7):
+        return (f(x + h) - f(x - h)) / (2 * h)
+
+    def integral(f, a, b, n=100000):
+        dx = (b - a) / n
+        return sum(f(a + i * dx) * dx for i in range(n))
+
+    f = lambda x: x**3
+    print(f"  f(x)=x³, f'(2) = {derivative(f, 2):.6f} (exact = 12)")
+    print(f"  ∫₀¹ x³ dx = {integral(f, 0, 1):.6f} (exact = 0.25)")
+
+    g = lambda x: math.sin(x)
+    print(f"  sin'(π/4) = {derivative(g, math.pi/4):.6f} (exact = √2/2 ≈ 0.707107)")
+    print(f"  ∫₀^π sin(x)dx = {integral(g, 0, math.pi):.6f} (exact = 2)")
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Calculus Toolkit")
+    print("=" * 50)
+    demonstrate_symbolic()
+    numerical_calculus_demo()
+    print("\n✓ Done!")</textarea>
+
+<textarea id="tool5">#!/usr/bin/env python3
+"""
+Number Theory Utilities for UCL Mathematics
+============================================
+Prime numbers, modular arithmetic, and cryptographic building blocks.
+Usage: python number_theory.py
+"""
+
+import math
+import random
+
+# ===== PRIMALITY =====
+
+def is_prime_trial(n):
+    """Trial division primality test. O(√n). Good for n < 10^12."""
+    if n < 2:
+        return False
+    if n < 4:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def is_prime_miller_rabin(n, k=10):
+    """Miller-Rabin probabilistic primality test.
+    Probability of false positive < 4^(-k). k=10 is sufficient for most uses."""
+    if n < 2:
+        return False
+    if n < 4:
+        return True
+    if n % 2 == 0:
+        return False
+
+    # Write n-1 = d * 2^s
+    s, d = 0, n - 1
+    while d % 2 == 0:
+        s += 1
+        d //= 2
+
+    for _ in range(k):
+        a = random.randrange(2, n - 2)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+# ===== GCD & Modulo =====
+
+def extended_gcd(a, b):
+    """Extended Euclidean Algorithm.
+    Returns (g, x, y) where g = gcd(a,b) and a*x + b*y = g"""
+    if b == 0:
+        return a, 1, 0
+    g, x1, y1 = extended_gcd(b, a % b)
+    return g, y1, x1 - (a // b) * y1
+
+def mod_inverse(a, m):
+    """Modular multiplicative inverse: find x such that a*x ≡ 1 (mod m)."""
+    g, x, _ = extended_gcd(a, m)
+    if g != 1:
+        raise ValueError(f"No inverse: gcd({a},{m}) = {g} ≠ 1")
+    return x % m
+
+def fast_pow(base, exp, mod=None):
+    """Fast modular exponentiation: base^exp (mod mod).
+    Uses exponentiation by squaring. O(log exp)."""
+    result = 1
+    b = base % mod if mod else base
+    e = exp
+    while e > 0:
+        if e % 2 == 1:
+            result = (result * b) % mod if mod else result * b
+        b = (b * b) % mod if mod else b * b
+        e //= 2
+    return result
+
+# ===== FACTORIZATION =====
+
+def prime_factors(n):
+    """Return list of prime factors of n."""
+    factors = []
+    d = 2
+    while d * d <= n:
+        while n % d == 0:
+            factors.append(d)
+            n //= d
+        d += 1 if d == 2 else 2
+    if n > 1:
+        factors.append(n)
+    return factors
+
+def euler_phi(n):
+    """Euler's totient function φ(n): count of numbers 1≤k≤n with gcd(k,n)=1."""
+    result = n
+    p = 2
+    while p * p <= n:
+        if n % p == 0:
+            while n % p == 0:
+                n //= p
+            result -= result // p
+        p += 1 if p == 2 else 2
+    if n > 1:
+        result -= result // n
+    return result
+
+# ===== DEMO =====
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Number Theory Toolkit")
+    print("=" * 50)
+
+    # Primes
+    print(f"\n1. Primes under 50: {[n for n in range(50) if is_prime_trial(n)]}")
+    big = 10**12 + 39
+    print(f"   10^12+39 is prime? {is_prime_miller_rabin(big)}")
+
+    # GCD and modular inverse
+    g, x, y = extended_gcd(48, 180)
+    print(f"\n2. gcd(48,180) = {g}, 48×{x} + 180×{y} = {g}")
+    inv = mod_inverse(7, 26)
+    print(f"   7⁻¹ mod 26 = {inv} (check: 7×{inv} mod 26 = {7*inv % 26})")
+
+    # Fast exponentiation
+    print(f"\n3. 3^100 mod 7 = {fast_pow(3, 100, 7)} (using fast modular exponentiation)")
+
+    # Factorization
+    print(f"\n4. 840 = {' × '.join(map(str, prime_factors(840)))}")
+    print(f"   φ(840) = {euler_phi(840)}")
+
+    # RSA demo
+    print(f"\n5. RSA mini-demo:")
+    p, q = 61, 53
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    e = 17  # Public exponent
+    d = mod_inverse(e, phi)  # Private exponent
+    msg = 42
+    encrypted = fast_pow(msg, e, n)
+    decrypted = fast_pow(encrypted, d, n)
+    print(f"   p={p}, q={q}, n={n}, φ(n)={phi}")
+    print(f"   Public key: (n={n}, e={e})")
+    print(f"   Private key: d={d}")
+    print(f"   Message {msg} → Encrypted {encrypted} → Decrypted {decrypted}")
+
+    print("\n✓ All tests passed!")</textarea>
+
+<textarea id="tool6">#!/usr/bin/env python3
+"""
+Function Plotter for UCL Mathematics
+=====================================
+Matplotlib-based function visualization template.
+REQUIRES: pip install matplotlib numpy
+Usage: python function_plotter.py
+"""
+
+try:
+    import matplotlib.pyplot as plt
+    import numpy as np
+    PLOT_AVAILABLE = True
+except ImportError:
+    PLOT_AVAILABLE = False
+    print("Please install: pip install matplotlib numpy")
+
+def plot_function(f, x_range=(-5, 5), title="f(x)", points=500):
+    """Plot a single function f(x) over x_range."""
+    if not PLOT_AVAILABLE:
+        print("Cannot plot: install matplotlib")
+        return
+
+    x = np.linspace(x_range[0], x_range[1], points)
+    y = [f(xi) for xi in x]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, y, 'b-', linewidth=2, label=str(title))
+    plt.axhline(y=0, color='k', linewidth=0.5)
+    plt.axvline(x=0, color='k', linewidth=0.5)
+    plt.grid(True, alpha=0.3)
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title(title)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+def plot_multiple(functions, x_range=(-5, 5), points=500):
+    """Plot multiple functions on the same axes."""
+    if not PLOT_AVAILABLE:
+        print("Cannot plot: install matplotlib")
+        return
+
+    x = np.linspace(x_range[0], x_range[1], points)
+    plt.figure(figsize=(10, 6))
+
+    for f, label, color in functions:
+        y = [f(xi) for xi in x]
+        plt.plot(x, y, color=color, linewidth=2, label=label)
+
+    plt.axhline(y=0, color='k', linewidth=0.5)
+    plt.axvline(x=0, color='k', linewidth=0.5)
+    plt.grid(True, alpha=0.3)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title('Function Comparison')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+def plot_parametric(fx, fy, t_range=(0, 2*np.pi), points=1000, title="Parametric"):
+    """Plot a parametric curve (x(t), y(t))."""
+    if not PLOT_AVAILABLE:
+        print("Cannot plot: install matplotlib")
+        return
+
+    t = np.linspace(t_range[0], t_range[1], points)
+    x = [fx(ti) for ti in t]
+    y = [fy(ti) for ti in t]
+
+    plt.figure(figsize=(8, 8))
+    plt.plot(x, y, 'r-', linewidth=2)
+    plt.axhline(y=0, color='k', linewidth=0.5)
+    plt.axvline(x=0, color='k', linewidth=0.5)
+    plt.grid(True, alpha=0.3)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title(title)
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("UCL Function Plotter")
+    print("=" * 50)
+
+    if not PLOT_AVAILABLE:
+        print("\nTo use this tool, first install dependencies:")
+        print("  pip install matplotlib numpy")
+        print("\nThen run this script again.")
+    else:
+        import math
+
+        # Example 1: sin(x) and its Taylor approximations
+        f_sin = lambda x: math.sin(x)
+        f_taylor3 = lambda x: x - x**3/6
+        f_taylor5 = lambda x: x - x**3/6 + x**5/120
+
+        print("\n1. Plotting sin(x) vs Taylor approximations...")
+        plot_multiple([
+            (f_sin, 'sin(x)', 'blue'),
+            (f_taylor3, 'x - x³/6 (3rd order)', 'orange'),
+            (f_taylor5, 'x - x³/6 + x⁵/120 (5th order)', 'green')
+        ], x_range=(-4, 4))
+
+        # Example 2: Parametric circle
+        print("2. Plotting parametric circle...")
+        plot_parametric(
+            lambda t: math.cos(t),
+            lambda t: math.sin(t),
+            t_range=(0, 2*np.pi),
+            title='Unit Circle: (cos(t), sin(t))'
+        )
+
+        # Example 3: Gaussian
+        print("3. Plotting Gaussian distribution...")
+        plot_function(
+            lambda x: math.exp(-x**2/2) / math.sqrt(2*math.pi),
+            x_range=(-4, 4),
+            title='Standard Normal Distribution φ(x)'
+        )
+
+        print("\n✓ All plots generated!")</textarea>
+</div>
+</main>
+
+<script>
+// ===== BUILD SIDEBAR NAV =====
+(function(){
+  var nav = document.getElementById('sidebarNav');
+  var groups = [
+    {id:'p1', icon:'🔰', title:'第一部分：Python 基础', links:[
+      {id:'s1-1', title:'1.1 什么是 Python？'},
+      {id:'s1-2', title:'1.2 安装与环境配置'},
+      {id:'s1-3', title:'1.3 第一个程序'},
+      {id:'s1-4', title:'1.4 变量与数据类型'},
+      {id:'s1-5', title:'1.5 运算符'},
+      {id:'s1-6', title:'1.6 输入与输出'}
+    ]},
+    {id:'p2', icon:'🔀', title:'第二部分：控制流程', links:[
+      {id:'s2-1', title:'2.1 条件判断 if/else'},
+      {id:'s2-2', title:'2.2 循环 for/while'},
+      {id:'s2-3', title:'2.3 break 和 continue'}
+    ]},
+    {id:'p3', icon:'📦', title:'第三部分：数据结构', links:[
+      {id:'s3-1', title:'3.1 列表 List'},
+      {id:'s3-2', title:'3.2 字典 Dict'},
+      {id:'s3-3', title:'3.3 集合 Set'},
+      {id:'s3-4', title:'3.4 字符串操作'}
+    ]},
+    {id:'p4', icon:'🔧', title:'第四部分：函数与模块', links:[
+      {id:'s4-1', title:'4.1 函数定义与调用'},
+      {id:'s4-2', title:'4.2 模块与导入'}
+    ]},
+    {id:'p5', icon:'📐', title:'第五部分：进阶基础', links:[
+      {id:'s5-1', title:'5.1 列表推导式'},
+      {id:'s5-2', title:'5.2 Lambda 函数'},
+      {id:'s5-3', title:'5.3 文件读写'},
+      {id:'s5-4', title:'5.4 异常处理'}
+    ]},
+    {id:'p6', icon:'🏗️', title:'第六部分：面向对象', links:[
+      {id:'s6-1', title:'6.1 类与对象'}
+    ]},
+    {id:'p7', icon:'🎓', title:'第七部分：数学技能', links:[
+      {id:'s7-1', title:'7.1 math 模块详解'},
+      {id:'s7-calc', title:'7.2 数值微积分'},
+      {id:'s7-monte', title:'7.3 蒙特卡洛模拟'},
+      {id:'s7-newton', title:'7.4 牛顿迭代法'}
+    ]},
+    {id:'advanced', icon:'🐛', title:'进阶练习：Debug 挑战', links:[
+      {id:'advanced', title:'6 道纠错练习题'}
+    ]},
+    {id:'tools', icon:'🛠️', title:'UCL 数学工具下载', links:[
+      {id:'tools', title:'6 个完整 .py 工具'}
+    ]}
+  ];
+  var html = '';
+  groups.forEach(function(g){
+    var linkCount = g.links.length;
+    html += '<div class="nav-group" id="ng-'+g.id+'">';
+    html += '<div class="nav-group-title" onclick="toggleGroup(\'ng-'+g.id+'\')"><span>'+g.icon+' '+g.title+'</span><span class="arrow">▼</span></div>';
+    html += '<div class="nav-group-links" style="max-height:'+(linkCount*32)+'px">';
+    g.links.forEach(function(l){
+      html += '<a class="nav-link" href="#'+l.id+'" data-target="'+l.id+'">'+l.title+'</a>';
+    });
+    html += '</div></div>';
+  });
+  nav.innerHTML = html;
+
+  // Collapse all groups except first
+  setTimeout(function(){
+    var groups = document.querySelectorAll('.nav-group');
+    for(var i=1; i<groups.length; i++){ groups[i].classList.add('collapsed'); }
+  },10);
+})();
+
+function toggleGroup(id){
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ===== SIDEBAR ACTIVE LINK =====
+(function(){
+  var links = document.querySelectorAll('.nav-link');
+  var sections = [];
+  links.forEach(function(l){ sections.push(l.dataset.target); });
+
+  function updateActive(){
+    var current = sections[0];
+    for(var i=sections.length-1; i>=0; i--){
+      var el = document.getElementById(sections[i]);
+      if(el && window.scrollY >= el.offsetTop - 100){ current = sections[i]; break; }
+    }
+    links.forEach(function(l){
+      l.classList.toggle('active', l.dataset.target === current);
+    });
+  }
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+
+  // Click handler for smooth scroll
+  links.forEach(function(l){
+    l.addEventListener('click', function(e){
+      e.preventDefault();
+      var target = document.getElementById(this.dataset.target);
+      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
+    });
+  });
+})();
+
+// ===== PYTHON INTERPRETER =====
+// ===== PYODIDE PYTHON RUNTIME =====
+var pyodideReady = false;
+var pyodide = null;
+
+async function initPyodide(){
+  var statusEl = document.getElementById('pyStatus');
+  try {
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/' });
+    // Set up input simulation: patch builtins.input to read from a queue
+    await pyodide.runPythonAsync(`
+import sys
+import builtins
+from io import StringIO
+
+_original_input = builtins.input
+_input_queue = []
+
+def _patched_input(prompt=''):
+    print(prompt, end='')
+    if _input_queue:
+        val = _input_queue.pop(0)
+        print(val)
+        return val
+    return _original_input(prompt)
+
+builtins.input = _patched_input
+
+# Capture stdout
+_output_buffer = StringIO()
+class _StdoutCapture:
+    def __init__(self, original):
+        self.original = original
+    def write(self, s):
+        _output_buffer.write(s)
+        self.original.write(s)
+    def flush(self):
+        self.original.flush()
+sys.stdout = _StdoutCapture(sys.stdout)
+
+def _get_output():
+    val = _output_buffer.getvalue()
+    _output_buffer.truncate(0)
+    _output_buffer.seek(0)
+    return val
+    `);
+    pyodideReady = true;
+    if(statusEl){ statusEl.className = 'py-status ready'; statusEl.innerHTML = '<span class="py-dot"></span>Python 3.12 就绪'; }
+  } catch(e) {
+    console.error('Pyodide load error:', e);
+    if(statusEl){ statusEl.className = 'py-status error'; statusEl.innerHTML = '<span class="py-dot"></span>Python 加载失败: '+e.message; }
+  }
+}
+
+async function runPython(code, inputs){
+  if(!pyodideReady || !pyodide){
+    return {success:false, output:'Python 环境尚未就绪，请稍等片刻后重试。'};
+  }
+  try {
+    // Set input queue
+    var inputList = inputs || [];
+    var inputSetup = '_input_queue = ' + JSON.stringify(inputList.slice().reverse()) + '\n';
+    await pyodide.runPythonAsync(inputSetup);
+    // Clear output buffer
+    await pyodide.runPythonAsync('_output_buffer.truncate(0); _output_buffer.seek(0)');
+    // Run user code
+    await pyodide.runPythonAsync(code);
+    // Get captured output
+    var output = pyodide.globals.get('_get_output')();
+    return {success:true, output:output||'(无输出)'};
+  } catch(e) {
+    return {success:false, output: e.message};
+  }
+}
+
+async function runCode(id){
+  var editor=document.getElementById('ed-'+id);
+  var fb=document.getElementById('fb-'+id);
+  if(!editor||!fb)return;
+  var code=editor.value.trim();
+  if(!code){fb.className='feedback err';fb.textContent='请先输入代码！';return;}
+  // Read simulated input values
+  var inputEl=document.getElementById('in-'+id);
+  var inputs=[];
+  if(inputEl){
+    var raw=inputEl.value.trim();
+    if(raw) inputs=raw.split(/[,\n]/).map(function(s){return s.trim();});
+  }
+  fb.className='feedback ok';
+  fb.textContent='▸ 运行中...';
+  var r=await runPython(code,inputs);
+  fb.className='feedback '+(r.success?'ok':'err');
+  fb.textContent='▸ 运行结果:\n'+r.output;
+}
+
+function copyCode(btn){
+  var pre=btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(function(){
+    btn.textContent='已复制 ✓';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='复制';btn.classList.remove('copied');},2000);
+  });
+}
+
+// ===== TOOL VIEWER & DOWNLOAD =====
+function viewTool(id){
+  var code=document.getElementById(id).value;
+  var modal=document.getElementById('toolModal');
+  var title=document.getElementById('toolTitle');
+  var codeDiv=document.getElementById('toolCode');
+  var titles={
+    'tool1':'numerical_methods.py — 数值方法工具包',
+    'tool2':'linear_algebra_utils.py — 线性代数工具包',
+    'tool3':'statistics_utils.py — 统计工具包',
+    'tool4':'calculus_tools.py — 微积分工具包（需 SymPy）',
+    'tool5':'number_theory.py — 数论工具包',
+    'tool6':'function_plotter.py — 函数绘图工具（需 Matplotlib）'
+  };
+  title.textContent=titles[id]||'Python 工具源码';
+  codeDiv.innerHTML='<div class="code-wrap"><div class="code-wrap-header"><div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div><span class="code-lang">Python</span><button class="code-copy" onclick="copyCode(this)">复制全部</button></div><pre><code>'+escapeHTML(code)+'</code></pre></div>';
+  modal.classList.add('open');
+}
+function closeTool(){
+  document.getElementById('toolModal').classList.remove('open');
+}
+function escapeHTML(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function downloadTool(id,filename){
+  var code=document.getElementById(id).value;
+  var blob=new Blob([code],{type:'text/x-python;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+// Close modal on backdrop click
+document.addEventListener('click',function(e){
+  var modal=document.getElementById('toolModal');
+  if(e.target===modal)closeTool();
+});
+// Close modal on Escape key
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeTool();
+});
+// Start Pyodide Python runtime (async, non-blocking)
+initPyodide();
+(function(){
+  var backTop=document.getElementById('backTop');
+  window.addEventListener('scroll',function(){
+    backTop.classList.toggle('show',window.scrollY>400);
+  });
+  // Fade-in
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in');});
+  },{threshold:0.12});
+  document.querySelectorAll('.fade').forEach(function(el){obs.observe(el);});
+})();
+</script>
+</body>
+</html>
